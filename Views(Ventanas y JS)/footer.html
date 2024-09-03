@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página con Footer en el Fondo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Hace que el contenedor ocupe toda la altura de la ventana */
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 100% de la altura de la ventana */
+        }
+
+        .content {
+            flex: 1; /* Toma todo el espacio disponible */
+        }
+
+        .footer {
+            background-color: #333; /* Fondo oscuro para el footer */
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Contenido principal -->
+        <div class="content container">
+            <h1>Contenido Principal</h1>
+            <p>Este es un ejemplo de contenido que se muestra en la página.</p>
+        </div>
+
+        <!-- Footer siempre en el fondo -->
+        <footer class="footer">
+            <p>© 2024 Mi Sitio Web</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
