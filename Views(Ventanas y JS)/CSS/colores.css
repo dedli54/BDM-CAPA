@@ -37,6 +37,58 @@ Body{
     
 }
 
+.textos-2{
+    font-family: 'Courier New', Courier, monospace;
+
+}
+
 /*
 Editar el footer de todas las paginas
 */
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Toda la altura de la ventana*/
+}
+
+.content {
+    flex: 1; 
+}
+
+.footer {
+    background-color: #333; 
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.opZero{
+    opacity:0%
+}
+
+.conLogo{
+    margin-top: 3%;
+    padding-left: 5%;
+}
+
+/*      css de cursos pero para no ocupar más espacios lo puse aquí */
+
+.form-field {
+    display: none; /* Oculta todos los campos por defecto */
+}
+.textarea-lg {
+    height: 150px;
+}
+
+.cardFondo{
+    margin-bottom: 5%;
+}
+
+
+/**/
+body{
+    
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight:200;
+      }

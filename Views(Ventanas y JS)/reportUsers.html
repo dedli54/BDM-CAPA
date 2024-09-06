@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    
+    <link rel="stylesheet" href="CSS/colores.css">
+    <link rel="stylesheet" href="CSS/reportes.css">
+
+
+</head>
+
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div class="container conLogo">
+        <h1 class="titulos">A&B Cursos</h1>
+        </div>
+    
+<div class="container card w-lg-50">
+
+          <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <!-- Logo de la barra de navegación -->
+                <!-- <a class="navbar-brand" href="#">A&J</a> -->
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Contenido oculto en dispositivos pequeños -->
+                <div class="collapse navbar-collapse" id="navbarOpciones">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="landPage.html">Principal</a>
+                        </li>
+                        
+                        <!-- Desplegable de opciones -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Mi perfil
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Ver perfil</a></li>
+                                <li><a class="dropdown-item" href="#">Kardex</a></li>
+                                 <li><hr class="dropdown-divider"></li> 
+                                <li><a class="dropdown-item" href="inicioSesion.html">Cerrar sesion</a></li> <!--style letras rojas-->
+
+                            </ul>
+                        </li>
+                    </ul>
+        
+                    <!-- Formulario de búsqueda ajustable -->
+                    <form class="d-flex w-auto w-md-50 w-lg-50">
+                        <input class="form-control me-2 textos" type="search" placeholder="Buscar" aria-label="Buscar">
+                        <button class="btn btn-outline-dark" type="submit">Buscar</button>
+                    </form>
+        
+                </div>
+            </div>
+        </nav>
+        
+</div>
+
+<div class="container mt-5"  >
+    <div class="card " > 
+        <div class="card-header text-center subtitulos">Reporte de usuarios</div> <!--quitar maybe-->
+        <div class="card-body">
+
+            
+
+                    <!-- Barra de Filtros -->
+
+
+  <h3 class="subtitulos">Tabla de alumnos</h3>
+        <div class=" table-responsive">
+
+                <table class="table">
+                  <thead class="table-dark">
+                    <tr>
+                      <th scope="col">ID</th>
+                      <th scope="col">Nombre</th>
+                      <th scope="col">Fecha ingreso</th>
+                      <th scope="col">Cursos inscritos</th>
+                      <th scope="col">% de terminados</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th>2</th>
+                        <th>Jose Aureliano</th>
+                        <th>02/01/01</th>
+                        <th>4</th>
+                        <th>25%</th>
+                    </tr>
+  
+                  </tbody>
+                </table>
+          </div>
+
+         <hr>
+          <h3 class="subtitulos">Tabla de instructores</h3>
+          <div class=" table-responsive">
+
+            <table class="table">
+                <thead class="table-dark">
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Fecha ingreso</th>
+                    <th scope="col">Cursos totales</th>
+                    <th scope="col">Ganancias</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <th>1</th>
+                      <th>Jose Pino</th>
+                      <th>01/01/01</th>
+                      <th>66</th>
+                      <th>$15000.00</th>
+                  </tr>
+
+                </tbody>
+            </table>
+      </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<footer class="text-center mt-auto">
+    <div class="container">
+        <p>&copy; J&A. Todos los derechos reservados.</p>
+        <p>
+            <a href="#" class="text-white me-3">Privacidad</a>
+        </p>
+    </div>
+</footer>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

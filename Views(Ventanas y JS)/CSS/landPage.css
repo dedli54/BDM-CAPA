@@ -10,6 +10,13 @@ body {
     padding: 1%;
 }
 
+.navBar{
+    background-color: white;
+    padding: 1%;
+    
+
+}
+
 .rowCurso{
     padding: auto;
 }
@@ -27,13 +34,9 @@ body {
 
 }
 
-.conLogo{
-    margin-top: 3%;
-}
 
-hr{
-    opacity:0%
-}
+
+
 
 footer {
     color: white;
