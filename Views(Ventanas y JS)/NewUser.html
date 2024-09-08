@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear usuario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/bootstrapCSS/bootstrap.min.css">
+
 
 
     <link rel="stylesheet" href="CSS/colores.css">
@@ -25,7 +26,7 @@
                     <!-- Columna 1 -->
                     <div class="col-md-11  col-lg-6">
                         <div class="mb-3">
-                            <label for="firstName" class="form-label fs-3 subtitulos">Nombre</label>
+                            <label for="nombre" class="form-label fs-3 subtitulos">Nombre</label>
                             <input type="text" class="form-control rounded-5" id="nombre" placeholder="Ingresa tu nombre">
                         </div>
 
@@ -40,12 +41,12 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="pw2" class="form-label fs-3 subtitulos">Confirmar contraseña</label>
+                            <label for="pw_conf" class="form-label fs-3 subtitulos">Confirmar contraseña</label>
                             <input type="password" class="form-control rounded-5" id="pw_conf" placeholder="Confirma tu contraseña">
                         </div>
 
                         <div class="mb-3 ">
-                            <label for="fileInput" class="form-label fs-3 subtitulos">Selecciona una imagen</label>
+                            <label for="foto" class="form-label fs-3 subtitulos">Selecciona una imagen</label>
                             <input type="file" class="form-control rounded-5" id="foto" accept="image/jpeg, image/png">
                         </div>
                         <div class="img-container d-flex justify-content-center">
@@ -59,7 +60,7 @@
                     <!-- Columna 2 -->
                     <div class="col-md-11  col-lg-6">
                         <div class="mb-3">
-                            <label for="lastName" class="form-label fs-3 subtitulos">Apellido</label>
+                            <label for="apellido" class="form-label fs-3 subtitulos">Apellido</label>
                             <input type="text" class="form-control rounded-5" id="apellido" placeholder="Ingresa tu apellido">
                         </div>
                         <div class="mb-3">
@@ -122,6 +123,6 @@
 
 
 <script src="JS/addUser.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
 </body>
 </html>
