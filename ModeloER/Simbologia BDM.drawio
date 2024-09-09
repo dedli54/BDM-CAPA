@@ -1,0 +1,66 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36" version="24.7.12">
+  <diagram name="Page-1" id="cCdkSBPGACsPbR1NGQEr">
+    <mxGraphModel dx="1674" dy="772" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-1" value="Llave Primaria" style="ellipse;whiteSpace=wrap;html=1;align=center;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="170" y="598.75" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="x5K38qCAz3rJ2zKtlZ06-2" target="x5K38qCAz3rJ2zKtlZ06-16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-2" value="Entidad" style="shape=ext;margin=3;double=1;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="170" y="105" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="x5K38qCAz3rJ2zKtlZ06-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="310" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-4" value="Relacion" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="160" y="988.75" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="x5K38qCAz3rJ2zKtlZ06-5" target="x5K38qCAz3rJ2zKtlZ06-26" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-5" value="Llave foranera" style="ellipse;shape=doubleEllipse;margin=3;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="180" y="822.5" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="x5K38qCAz3rJ2zKtlZ06-7" target="x5K38qCAz3rJ2zKtlZ06-21" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-7" value="Atributo" style="ellipse;whiteSpace=wrap;html=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="170" y="457.5" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-16" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Entidad&lt;/h1&gt;&lt;p&gt;Es un objeto o concepto del mundo real que puede identificarse de manera única y sobre el cual se desea almacenar información en una base de datos&lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="450" y="50" width="180" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-18" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Entidad Debil&lt;/h1&gt;&lt;p&gt;Es una entidad que no puede ser identificada únicamente por sus propios atributos y depende de una entidad fuerte para existir. Se caracteriza por tener una relación de dependencia con otra entidad (la entidad fuerte) y usa la llave primaria de la entidad fuerte como parte de su propia llave primaria.&lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="450" y="210" width="180" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-21" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Atributo&lt;/h1&gt;&lt;p&gt;Es una propiedad o característica que describe a una entidad.&lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="450" y="430" width="180" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-23" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Llave Primaria (Primary Key)&lt;br&gt;&lt;/h1&gt;&lt;p&gt;Es un atributo (o un conjunto de atributos) que identifica de manera única a cada registro en una tabla de una base de datos. Es un identificador único para cada instancia de la entidad. &lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="450" y="550" width="180" height="188.75" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-26" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Llave Foránea (Foreign Key)&lt;br&gt;&lt;/h1&gt;&lt;p&gt;Es un atributo en una tabla que establece una relación con la llave primaria de otra tabla. Es un vínculo entre dos entidades y asegura la integridad referencial en la base de datos. &lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="460" y="748.75" width="180" height="187.5" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-28" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Relacion&lt;/h1&gt;&lt;p&gt;Es una asociación entre dos o más entidades que muestra cómo interactúan o están conectadas entre sí.&lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="450" y="936.25" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.011;entryY=0.69;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="x5K38qCAz3rJ2zKtlZ06-4" target="x5K38qCAz3rJ2zKtlZ06-28" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x5K38qCAz3rJ2zKtlZ06-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.017;entryY=0.366;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="x5K38qCAz3rJ2zKtlZ06-1" target="x5K38qCAz3rJ2zKtlZ06-23" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Qlj6a1W71M_kTLBuH14R-1" value="Entidad Debil" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="190" y="280" width="100" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
