@@ -1,0 +1,13 @@
+.card-chat{
+    width: 50%;
+    border-color: #343a4000;
+    box-shadow: 5px 5px #343a40;
+}
+
+/*Para los campos Number de Bootstrap*/
+
+.no-spin::-webkit-inner-spin-button,
+.no-spin::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

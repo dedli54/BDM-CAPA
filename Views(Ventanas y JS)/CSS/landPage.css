@@ -13,8 +13,6 @@ body {
 .navBar{
     background-color: white;
     padding: 1%;
-    
-
 }
 
 .rowCurso{
@@ -25,13 +23,9 @@ body {
     padding: 2%;
 }
 
-
-
 .card{
-
     border-color: #343a4000;
     box-shadow: 5px 5px #343a40
-
 }
 
 

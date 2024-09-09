@@ -56,3 +56,9 @@ box-shadow: 5px 5px #343a40
 .no-spin {
     -moz-appearance: textfield;
 }*/
+
+@media all  {
+    .cardLogin{
+        margin: 0%;
+    }
+}
