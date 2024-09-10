@@ -31,6 +31,14 @@ Body{
   letter-spacing: 0.01em;
 }
 
+.subtitulos-categoria{
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.5);
+    
+  letter-spacing: 0.01em;
+}
+
 .textos{
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight:200;
