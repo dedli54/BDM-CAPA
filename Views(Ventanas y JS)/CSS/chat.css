@@ -6,21 +6,42 @@
     box-shadow: 3px 3px 5px 5px #343a40;
     margin: 5%;
 }
-
 h3{
     text-align: center;
     padding: 5%;
 }
-
 .mensajes{
+    border-radius: 3%;
     box-shadow: 3px 3px 5px 5px #85888d;
-    margin: 20%;
-    padding: 40%;
+    height: 70%;
+}
+
+.ejemplo{
+    margin: 35%;
+    width: 100%;
+}
+
+.texto{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 5%;
+    text-align: center;
+    color: #f2f2f2;
+    border-radius:  5%;
+    background-color: #343a40;
+}
+
+.enviar{
+    display: flex;
+    justify-content: center;
+    
 }
 
 .mensaje{
     box-shadow: 3px 3px 5px 5px #85888d;
-    margin: 35%;
+    padding: 40%;
+    width: 200%;
 }
 
 footer {
