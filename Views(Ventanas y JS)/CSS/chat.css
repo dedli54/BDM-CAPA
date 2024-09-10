@@ -1,13 +1,43 @@
 .card-chat{
-    width: 50%;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
     border-color: #343a4000;
-    box-shadow: 5px 5px #343a40;
+    box-shadow: 3px 3px 5px 5px #343a40;
+    margin: 5%;
 }
 
-/*Para los campos Number de Bootstrap*/
+h3{
+    text-align: center;
+    padding: 5%;
+}
 
-.no-spin::-webkit-inner-spin-button,
-.no-spin::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.mensajes{
+    box-shadow: 3px 3px 5px 5px #85888d;
+    margin: 20%;
+    padding: 40%;
+}
+
+.mensaje{
+    box-shadow: 3px 3px 5px 5px #85888d;
+    margin: 35%;
+}
+
+footer {
+    color: white;
+    padding: 1rem 0;
+}
+
+.cont-Cursos{
+
+    padding: auto;
+}
+
+.rowCursos{
+
+    padding: 2%; gap: 10px;
+}
+
+.imgCard{
+    object-fit: cover;
 }
