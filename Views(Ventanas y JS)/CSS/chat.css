@@ -13,7 +13,8 @@ h3{
 .mensajes{
     border-radius: 3%;
     box-shadow: 3px 3px 5px 5px #85888d;
-    height: 70%;
+    height: 250%;
+    width: 200%;
 }
 
 .ejemplo{
