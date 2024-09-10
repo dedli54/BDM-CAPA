@@ -18,7 +18,6 @@ h3{
 
 .ejemplo{
     margin: 35%;
-    width: 100%;
 }
 
 .texto{
@@ -34,14 +33,25 @@ h3{
 
 .enviar{
     display: flex;
-    justify-content: center;
-    
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0%;
+    padding: 0%;
+}
+
+.enviar > input{
+    height: 30px;
+    width: 200px;
+}
+
+.enviar > button{
+    width: 50px;
+    height: 25px;
 }
 
 .mensaje{
     box-shadow: 3px 3px 5px 5px #85888d;
-    padding: 40%;
-    width: 200%;
+    padding: 5%;
 }
 
 footer {
