@@ -1,30 +1,64 @@
 .card-chat{
     display: flex;
-    justify-content: center;
+    flex-direction: column-reverse;
     border-radius: 20px;
     border-color: #343a4000;
     box-shadow: 3px 3px 5px 5px #343a40;
-    margin: 5%;
+    margin: 3%;
 }
+.busqueda-input{
+    color: #f2f2f2;
+    background-color: #343a40;
+}
+
+button{
+    width: 20%;
+    height: 20%;
+    background-color: #343a40;
+    color: #f2f2f2;
+}
+
+button:hover{
+    background-color: #f2f2f2;
+    color: #343a40; 
+}
+
 h3{
     text-align: center;
     padding: 5%;
 }
 .mensajes{
+    display: flex;
+    align-items:center;
+    box-shadow: 3px 3px 3px #85888d;
     border-radius: 3%;
-    box-shadow: 3px 3px 5px 5px #85888d;
-    height: 250%;
-    width: 200%;
+    margin: 4%;
+    padding: 0%;
+    margin-left: 0;
+    padding-left: 0;
 }
 
-.ejemplo{
-    margin: 35%;
+.mensajes:hover{
+    background-color: #85888d;
+}
+
+.profesor{
+    margin: 5%;
+    box-shadow: 2px 2px 3px 3px #343a40;
+    border-radius: 3%;
+}
+
+.propio{
+    margin: 5%;
+    background-color: #85888d;
+    box-shadow: 3px 3px #343a40;
+    text-align: end;
+    align-items: end;
+    border-radius: 3%;
 }
 
 .texto{
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     margin: 5%;
     text-align: center;
     color: #f2f2f2;
@@ -41,18 +75,13 @@ h3{
 }
 
 .enviar > input{
-    height: 30px;
-    width: 200px;
+    height: 20%;
+    width: 50%;
 }
 
-.enviar > button{
-    width: 50px;
-    height: 25px;
-}
 
 .mensaje{
     box-shadow: 3px 3px 5px 5px #85888d;
-    padding: 5%;
 }
 
 footer {

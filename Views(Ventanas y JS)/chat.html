@@ -11,31 +11,51 @@
 <body>
     
     <div class="card-chat">
-        <form id="chat" class="row align-items-center">
+        <form id="chat">
             <h3 class="col-9">Bandeja de entrada</h3>
-            <nav>
-
-            </nav>
-            <div class="row align-items-center">
-                <div class="col-5">
-                    <div class="col-5">
-                        <p class="mensajes">Chat 1</p>
-                        <p class="mensajes">Chat 2</p>
-                        <p class="mensajes">Chat 3</p>
-                        <p class="mensajes">Chat 4</p>
-                        <p class="mensajes">Chat 5</p>
-                        <p class="mensajes">Chat 6</p>
-                        <p class="mensajes">Chat 7</p>
-                        <p class="mensajes">Chat 8</p>
+            <div class="container">
+                <div class="row">
+                        <div class="col-3">
+                            <div class="container mt-5">
+                                <form class="d-flex" role="search">
+                                    <input class="form-control me-2 busqueda-input" type="search" placeholder="Buscar..." aria-label="Search">
+                                    <button class="btn btn-outline-primary" type="submit">Buscar</button>
+                                </form>
+                            </div>
+                            <p class="mensajes">
+                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
+                                Chat 1
+                            </p>
+                            <p class="mensajes">
+                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
+                                Chat 2
+                            </p>
+                            <p class="mensajes">
+                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
+                                Chat 3
+                            </p>
+                            <p class="mensajes">
+                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
+                                Chat 4
+                            </p>
+                            <p class="mensajes">
+                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
+                                Chat 5
+                            </p>
+                        </div>
+                    <div class="col-9 mensaje">
+                        <div class="profesor">
+                            Mensaje profesor
+                        </div>
+                        <div class="propio">
+                            Mensaje propio
+                        </div>
                     </div>
+                        <div class="enviar">
+                            <input class="texto" placeholder="Escribe un texto">
+                            <button>Enviar</button>
+                        </div>
                 </div>
-                <div class="col-7 mensaje">
-                    <p class="ejemplo">Mensajes</p>
-                </div>
-                    <div class="enviar">
-                        <input class="texto" placeholder="Escribe un texto">
-                        <button>Enviar</button>
-                    </div>
             </div>
         </form>
     </div>
