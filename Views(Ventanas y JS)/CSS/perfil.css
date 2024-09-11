@@ -29,6 +29,12 @@
     border-radius: 50%;
     object-fit: cover;
   }
+
+  .fotoPerfil{ /*Circular*/
+    width: 150px; height: 150px; object-fit: cover;
+  }
+
+
   .comentario {
     margin-top: 10px;
   }
