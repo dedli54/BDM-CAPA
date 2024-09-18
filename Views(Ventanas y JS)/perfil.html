@@ -116,8 +116,14 @@
                 </div>
 
             </div>
+
+            
         </div>
     </div>
+
+    <div class="d-flex justify-content-end btnDiv"> 
+        <a href="Edit_User.html"><button class="btn btn-lg btn-dark">Editar mis datos</button></a>
+      </div>
 
     <div class="container">
         <hr class="opZero">
@@ -172,6 +178,39 @@
             </div>
         </div>
 
+        <hr>
+        <div class="d-flex justify-content-end btnDiv"> 
+            <button class="btn btn-lg btn-dark" id="buyCurso">Agregar Categoria</button>
+          </div>
+
+        <!--                FORMS OCULTO PARA AGREGAR CATEGORIA         -->
+        <div id="overlay" class="overlay"></div>
+        <div class="container card buyForms" id="formBuy">
+            
+                        <form>
+
+                            
+
+                            <div class="row d-flex justify-content-center">
+                                <div class="col-5">
+                                    <div class="mb-3">
+                                    <label for="vencimiento" class="form-label">Nombre de categoria (no repetir)</label>
+                                    <input type="text" class="form-control" id="vencimiento" placeholder="Categoria New" required>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-end "> 
+                                <button type="submit" class="btn btn-lg btn-dark" id="buyCurso">Agregar</button>
+                              </div>
+
+                        </form>
+                    
+        </div>
+
     <main class="flex-grow-1 container">
     <hr class="opZero"><hr class="opZero"><hr class="opZero">
         
@@ -188,5 +227,6 @@
     </footer>
 
     
+<script src="JS/comprarCurso.js"></script>
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
 </body>
