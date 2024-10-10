@@ -1,0 +1,15 @@
+Notas para julian front
+
+en el chat poner el header
+
+(no tan importante) Intentar renombrar todos los archivos para que esten sincronizados al otro Proyecto
+por ejemplo lo de java script 
+
+hacer que todos los campos anden gual por ejemplo en el de nosotros esta el "Nombre" y en el otro esta "Nombre de usuario"
+son pendejadas pero para que este todo sincronizado entre los 2 fronts y el back no haya tanto pedo
+
+en perfil agregar un boton para que te mande al chat
+
+cambiar el nombre de los archivos pa que anden igual por ejemplo nosotros "Crear curso" ellos "Nuevo curso" mas que nada para que no nos confundamos a la mera hora jsjsjs
+
+pedirle a michelle que haga la ventana de editar usuario

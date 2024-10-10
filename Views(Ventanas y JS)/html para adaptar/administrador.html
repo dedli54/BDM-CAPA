@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="CSS/bootstrapCSS/bootstrap.min.css">
+    <link rel="stylesheet" href="CSS/administrador.css">
+    <link rel="icon" href="Imagenes/brain.png">
+    <title>Alta administrador</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-pink">
+        <div class="container-fluid">
+            <img src="Imagenes/brain.png" alt="" width="30" height="30">
+            <a class="navbar-brand" href="#">Mercury</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="landingpage.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="perfil.html">Mi perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">Cerrar sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="busquedaAvanzada.html">Categorías</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Cursos
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="Busqueda.html">Generales</a></li>
+                    <li><a class="dropdown-item" href="#">Arte</a></li>
+                    <li><a class="dropdown-item" href="#">Matemáticas</a></li>
+                    <li><a class="dropdown-item" href="#">Programación</a></li>
+                    <li><a class="dropdown-item" href="#">Marketing</a></li>
+                    <li><a class="dropdown-item" href="#">Diseño</a></li>
+                </ul>
+                    </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
+                <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            </form>
+            </div>
+        </div>
+    </nav>
+
+    <form id="miFormulario" onsubmit="validarFormulario(event)">
+        <div class="registro">
+            <h3>Registro de administrador</h3>
+            <div class="row align-items-center">
+                <div class="col">
+                    <label for="">Nombre de usuario:</label>
+                    <input type="text" name="Nombre de Usuario" id="nombre_usuario" placeholder="Nombre de Usuario">
+                    <label for="">Apellido:</label>
+                    <input type="text" name="apellidos" id="apellido" placeholder="Apellido">
+                    <label for="">Correo Electrónico:</label>
+                    <input type="email" name="email" id="email" placeholder="Correo electrónico">
+                    <label for="phone">Teléfono:</label>
+                    <input type="number" name="telefono" id="telefono" placeholder="Teléfono">
+                    <label for="">Fecha de nacimiento:</label>
+                    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento">
+                </div>
+                <div class="col">
+                    <label for="">Contraseña:</label>
+                    <input type="password" name="contraseña" id="contraseña" placeholder="Contraseña">
+                    <label for="">Género</label>
+                    <select name="Género" id="genero">
+                        <option selected>Género</option>
+                        <option value="1">Masculino</option>
+                        <option value="2">Femenino</option>
+                    </select>
+                    <label for="">Selecciona una imagen:</label>
+                    <input type="file" name="imagen" id="imagen">
+                    <label for="">Tipo de cuenta:</label>
+                    <select name="Tipo de cuenta" id="tipo_de_cuenta">
+                        <option selected>Tipo de cuenta</option>
+                        <option value="1">Administrador</option>
+                    </select>
+                </div>
+                <div class="final">
+                    <br>
+                    <button type="submit">Aceptar</button>
+                    <br>
+                    <button><a href="login.html">Cancelar</a></button>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>  
+</body>
+</html>
