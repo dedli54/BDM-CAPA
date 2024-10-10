@@ -21,7 +21,7 @@ CREATE TABLE usuario (
     apellidos VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL,
-    foto BLOB, -- PREGUNTAR QUE ES MAS RECOMENDABLE SI USAR BLOB O USAR VARCHAR 
+    foto BLOB, -- PREGUNTAR QUE ES MAS RECOMENDABLE SI USAR BLOB O USAR VARCHAR  //aqui blob porque es mas rapido y los demas en varchar  // blob almenos en el de usuario o si parece mejor en el curso, porque tenemos que tener uno
     fecha_nacimiento DATE,
     intentos_fallidos TINYINT DEFAULT 0,
     estado BOOLEAN DEFAULT TRUE,
@@ -87,6 +87,8 @@ CREATE TABLE inscripcion (
     FOREIGN KEY (id_curso) REFERENCES Curso(id)
 );
 
+-- cuando se compra es cuando se inscribe asi que la de arriba no sirve tanto...
+-- que queremos distinguir con esta tabla //para guardar recivos
 -- transacciones realizadas por los alumnos hacia los maestros PREGUNTAR AL PROFE , TENGO DUDAS DE LA ESTRUCTURACION DE LOS DATOS EN ESTA TABLA
 CREATE TABLE transaccion (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -179,12 +181,13 @@ END$$
 DELIMITER ;
 
 -- SP visualizar usuarios , podria usarse para ver perfil o para una visualizacion en los reportes de algun administrados
+-- Tambien tenemos que tener vistas asi que podemos cambiar unos SP por vistas 
 DELIMITER $$
 	CREATE PROCEDURE sp_consultar_usuario(
     IN p_id INT
 )
 BEGIN
-    SELECT *
+    SELECT * -- awas con esto
     FROM usuario
     WHERE id = p_id;
 END$$
@@ -204,4 +207,4 @@ END$$
 
 DELIMITER ;
 
--- PD FINAL : LOS COMENTARIOS SI LOS HICE YO , NO USE CHATGPT XD BORRA ESTO BETOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+--chat, agregar cursos, aprovar cursos
