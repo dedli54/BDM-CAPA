@@ -1,3 +1,5 @@
+-- TABLAS--
+
 -- LA PRIMER TABLA QUE SE DEBE CREAR ES LA DE TIPO DE USUARIOS
 
 CREATE TABLE tipo_usuario (
@@ -11,9 +13,8 @@ VALUES
     (1, 'Administrador'),
     (2, 'Instructor'),
     (3, 'Alumno');
-
-
--- La tabla "padre" por asi decirlo ya que en esta tabla se almacenara toda la informacion 
+    
+-- Se cambio la tabla por que se me hizo muy innecesario tener 2 tablas admin y mejor agrege como campo no obligatorio biografia  cuenta bancaria por si es un usuario tipo instructor
 CREATE TABLE usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(100) NOT NULL,
@@ -21,29 +22,23 @@ CREATE TABLE usuario (
     apellidos VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL,
-    foto BLOB, -- PREGUNTAR QUE ES MAS RECOMENDABLE SI USAR BLOB O USAR VARCHAR  //aqui blob porque es mas rapido y los demas en varchar  // blob almenos en el de usuario o si parece mejor en el curso, porque tenemos que tener uno
+    foto BLOB, -- Puedes usar BLOB o VARCHAR(255), dependiendo de tu decisión
     fecha_nacimiento DATE,
     intentos_fallidos TINYINT DEFAULT 0,
     estado BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    telefono bigint,
-    tipo_usuario TINYINT NOT NULL,
+    telefono BIGINT,
+    tipo_usuario TINYINT NOT NULL, -- 1: Admin, 2: Instructor, 3: Alumno
+    biografia TEXT, -- Campo adicional para el instructor
+    cuenta_bancaria VARCHAR(50), -- Campo adicional para el instructor
     FOREIGN KEY (tipo_usuario) REFERENCES tipo_usuario(id)
 );
-
--- NOTA , Si las tablas de instructor y admin son tan cortitas es por que ya comparten la mayoria de informacion tanto admin como instructor como alumno , solo el ID los diferenciara el ID de la tabla tipo perfil
-CREATE TABLE  instructor(
-    id INT PRIMARY KEY,
-    biografia TEXT,
-    cuenta_bancaria VARCHAR(50),
-    FOREIGN KEY (id) REFERENCES Usuario(id)
-);
-
--- RECUERDA solo los admins pueden dar de alta categorias
-CREATE TABLE admin (
-    id INT PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES Usuario(id)
-);
+-- Insertar 3 usuarios con perfiles diferentes(DATOS DUMMY)
+INSERT INTO usuario (nombre_usuario, nombre, apellidos, email, contrasena, tipo_usuario, fecha_nacimiento, telefono, biografia, cuenta_bancaria)
+VALUES 
+    ('admin_user', 'Admin', 'User', 'admin@example.com', 'password123', 1, '1980-05-10', 1234567890, NULL, NULL), -- Administrador
+    ('instructor_user', 'John', 'Doe', 'john@example.com', 'password123', 2, '1985-07-15', 1234567891, 'Experienced instructor', '1234567890123456'), -- Instructor
+    ('student_user', 'Jane', 'Smith', 'jane@example.com', 'password123', 3, '2000-09-20', 1234567892, NULL, NULL); -- Alumna
 
 
 CREATE TABLE categoria (
@@ -51,19 +46,6 @@ CREATE TABLE categoria (
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT
 );
-
-
--- -------------------------------------------------------------------------
-
--- Prototipo de consulta multitabla en la cual se vera los usuarios con su respectivo nivel jerarquico en el sistema
--- nota 2: podria usarse como view para la revision final 
-SELECT u.id, u.nombre_usuario, u.nombre, u.apellidos, u.email, tu.descripcion AS tipo_usuario
-FROM usuario u
-JOIN tipo_usuario tu ON u.tipo_usuario = tu.id;
-
--- --------------------------------------------------------------------------
-
-
 -- Cursos creados por maestros
 CREATE TABLE curso (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -87,8 +69,6 @@ CREATE TABLE inscripcion (
     FOREIGN KEY (id_curso) REFERENCES Curso(id)
 );
 
--- cuando se compra es cuando se inscribe asi que la de arriba no sirve tanto...
--- que queremos distinguir con esta tabla //para guardar recivos
 -- transacciones realizadas por los alumnos hacia los maestros PREGUNTAR AL PROFE , TENGO DUDAS DE LA ESTRUCTURACION DE LOS DATOS EN ESTA TABLA
 CREATE TABLE transaccion (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -121,11 +101,30 @@ CREATE TABLE kardex (
     FOREIGN KEY (id_curso) REFERENCES Curso(id)
 );
 
--- STORE PROCEDURE
+-- TABLAS --
+
+-- VIEWS --
+
+-- Esta View lo que hace es traer datos principales del usuario, como el nombre de la cuenta , el correo , nombre del usuario , y con la otra tabla tipo de usuario trae el tipo de usuario que sea
+CREATE VIEW vw_reporte_usuarios AS
+SELECT u.id, u.nombre_usuario, u.nombre, u.apellidos, u.email, tu.descripcion AS tipo_usuario
+FROM usuario u
+JOIN tipo_usuario tu ON u.tipo_usuario = tu.id;
+
+-- VIEWS --
+
+-- TRIGGERS -- 
+
+-- OBRA EN PROGRESO--
+
+-- TRIGGERS -- 
+
+-- STORE PROCEDURE --
 
 
 -- SP para crear usuarios
 DELIMITER $$
+
 CREATE PROCEDURE sp_crear_usuario(
     IN p_nombre_usuario VARCHAR(100),
     IN p_nombre VARCHAR(100),
@@ -135,7 +134,9 @@ CREATE PROCEDURE sp_crear_usuario(
     IN p_tipo_usuario TINYINT,
     IN p_foto BLOB,
     IN p_fecha_nacimiento DATE,
-    IN p_telefono BIGINT
+    IN p_telefono BIGINT,
+    IN p_biografia TEXT,
+    IN p_cuenta_bancaria VARCHAR(50)
 )
 BEGIN
     -- Verifica si el email ya existe
@@ -145,14 +146,22 @@ BEGIN
         -- Si no existe, inserta el nuevo usuario
         INSERT INTO usuario (nombre_usuario, nombre, apellidos, email, contrasena, tipo_usuario, foto, fecha_nacimiento, telefono)
         VALUES (p_nombre_usuario, p_nombre, p_apellidos, p_email, p_contrasena, p_tipo_usuario, p_foto, p_fecha_nacimiento, p_telefono);
+
+        -- Si el usuario es un instructor, insertar biografía y cuenta bancaria en tabla instructor
+        IF p_tipo_usuario = 2 THEN
+            INSERT INTO instructor (id, biografia, cuenta_bancaria)
+            VALUES (LAST_INSERT_ID(), p_biografia, p_cuenta_bancaria);
+        END IF;
     END IF;
 END$$
 
 DELIMITER ;
 
---SP para editar usuarios
+
+-- SP para editar usuarios
 DELIMITER $$
-	CREATE PROCEDURE sp_editar_usuario(
+
+CREATE PROCEDURE sp_editar_usuario(
     IN p_id INT,
     IN p_nombre_usuario VARCHAR(100),
     IN p_nombre VARCHAR(100),
@@ -162,7 +171,9 @@ DELIMITER $$
     IN p_tipo_usuario TINYINT,
     IN p_foto BLOB,
     IN p_fecha_nacimiento DATE,
-    IN p_telefono BIGINT
+    IN p_telefono BIGINT,
+    IN p_biografia TEXT,
+    IN p_cuenta_bancaria VARCHAR(50)
 )
 BEGIN
     UPDATE usuario
@@ -176,35 +187,82 @@ BEGIN
         fecha_nacimiento = p_fecha_nacimiento,
         telefono = p_telefono
     WHERE id = p_id;
+
+    -- Si el usuario es un instructor, actualizar biografía y cuenta bancaria
+    IF p_tipo_usuario = 2 THEN
+        UPDATE instructor
+        SET biografia = p_biografia,
+            cuenta_bancaria = p_cuenta_bancaria
+        WHERE id = p_id;
+    END IF;
 END$$
+
+DELIMITER ;
+
 
 DELIMITER ;
 
 -- SP visualizar usuarios , podria usarse para ver perfil o para una visualizacion en los reportes de algun administrados
--- Tambien tenemos que tener vistas asi que podemos cambiar unos SP por vistas 
 DELIMITER $$
-	CREATE PROCEDURE sp_consultar_usuario(
+
+CREATE PROCEDURE sp_consultar_usuario(
     IN p_id INT
 )
 BEGIN
-    SELECT * -- awas con esto
-    FROM usuario
-    WHERE id = p_id;
+    -- Consulta la información del usuario
+    SELECT u.*, tu.descripcion AS tipo_usuario
+    FROM usuario u
+    JOIN tipo_usuario tu ON u.tipo_usuario = tu.id
+    WHERE u.id = p_id;
+    
+    -- Si es un instructor, mostrar la biografía y cuenta bancaria
+    IF (SELECT tipo_usuario FROM usuario WHERE id = p_id) = 2 THEN
+        SELECT biografia, cuenta_bancaria
+        FROM instructor
+        WHERE id = p_id;
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- SP Eliminado logico , esto lo que hara solamente sera pasar a ser un usuario inactivo 
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_eliminar_logico_usuario(
+    IN p_id INT
+)
+BEGIN
+    -- Verifica si el usuario ya está inactivo
+    IF (SELECT estado FROM usuario WHERE id = p_id) = FALSE THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El usuario ya está inactivo';
+    ELSE
+        -- Cambiar el estado del usuario a inactivo (FALSE)
+        UPDATE usuario
+        SET estado = FALSE
+        WHERE id = p_id;
+    END IF;
 END$$
 
 DELIMITER ;
 
 
---SP para eliminar un usuario , OJO, esto no es un desactivado es una ELIMINACION TOTAL, falta crear el SP para desactivar un usuario pero que siga existiendo en la BD
+-- SP para eliminar un usuario , OJO, esto no es un desactivado es una ELIMINACION TOTAL, falta crear el SP para desactivar un usuario pero que siga existiendo en la BD
 DELIMITER $$
-	CREATE PROCEDURE sp_eliminar_usuario(
+
+CREATE PROCEDURE sp_eliminar_usuario(
     IN p_id INT
 )
 BEGIN
-    DELETE FROM usuario
-    WHERE id = p_id;
+    -- Si el usuario es un instructor, eliminar su información adicional
+    IF (SELECT tipo_usuario FROM usuario WHERE id = p_id) = 2 THEN
+        DELETE FROM instructor WHERE id = p_id;
+    END IF;
+
+    -- Eliminar al usuario de la tabla usuario
+    DELETE FROM usuario WHERE id = p_id;
 END$$
 
 DELIMITER ;
 
---chat, agregar cursos, aprovar cursos
+-- STORE PROCEDURE --
