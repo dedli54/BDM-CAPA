@@ -265,4 +265,104 @@ END$$
 
 DELIMITER ;
 
--- STORE PROCEDURE --
+-- SP agregar inscripcion a un curso --
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_agregar_inscripcion (
+    IN p_id_alumno INT,
+    IN p_id_curso INT
+)
+BEGIN
+    -- Verifica si curso existe
+    IF EXISTS (SELECT 1 FROM curso WHERE id = p_id_curso) THEN
+        -- Verifica si ya esta inscrito
+        IF NOT EXISTS (SELECT 1 FROM inscripcion WHERE id_alumno = p_id_alumno AND id_curso = p_id_curso) THEN
+            -- Nueva Inscripcion
+            INSERT INTO inscripcion (id_alumno, id_curso)
+            VALUES (p_id_alumno, p_id_curso);
+        END IF;
+    END IF;
+END $$
+
+DELIMITER ;
+
+-- SP para borrar inscripcion --
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_borrar_inscripcion (
+    IN p_id_alumno INT,
+    IN p_id_curso INT
+)
+BEGIN
+    -- Eliminar inscripción si existe
+    DELETE FROM inscripcion
+    WHERE id_alumno = p_id_alumno AND id_curso = p_id_curso;
+END $$
+
+DELIMITER ;
+
+-- SP agregar curso para maestro --
+DELIMITER $$
+
+CREATE PROCEDURE sp_agregar_curso (
+    IN p_titulo VARCHAR(255),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10,2),
+    IN p_contenido TEXT,
+    IN p_id_maestro INT,
+    IN p_id_categoria INT
+)
+BEGIN
+    
+    INSERT INTO curso (titulo, descripcion, precio, contenido, id_maestro, id_categoria)
+    VALUES (p_titulo, p_descripcion, p_precio, p_contenido, p_id_maestro, p_id_categoria);
+END $$
+
+DELIMITER ;
+
+-- SP editar curso para maestro--
+DELIMITER $$
+
+CREATE PROCEDURE sp_editar_curso (
+    IN p_id INT,
+    IN p_titulo VARCHAR(255),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10,2),
+    IN p_contenido TEXT,
+    IN p_id_maestro INT,
+    IN p_id_categoria INT
+)
+BEGIN
+    
+    UPDATE curso
+    SET titulo = p_titulo,
+        descripcion = p_descripcion,
+        precio = p_precio,
+        contenido = p_contenido,
+        id_maestro = p_id_maestro,
+        id_categoria = p_id_categoria
+    WHERE id = p_id;
+END $$
+
+DELIMITER ;
+
+-- SP borrar curso--
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_borrar_curso (
+    IN p_id_curso INT,
+    IN p_id_maestro INT
+)
+BEGIN
+    
+    DELETE FROM curso
+    WHERE id = p_id_curso AND id_maestro = p_id_maestro;
+END $$
+
+DELIMITER ;
+
+-- STORE PROCEDURE--
+
