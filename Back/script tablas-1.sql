@@ -46,6 +46,17 @@ CREATE TABLE categoria (
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT
 );
+
+CREATE TABLE reporte_categoria (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_admin INT,
+    nombre_admin VARCHAR(100),
+    nombre_categoria VARCHAR(100),
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_admin) REFERENCES usuario(id)
+);
+
+
 -- Cursos creados por maestros
 CREATE TABLE curso (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,7 +66,7 @@ CREATE TABLE curso (
     contenido TEXT,
     id_maestro INT,
     id_categoria INT,
-    FOREIGN KEY (id_maestro) REFERENCES Maestro(id),
+    FOREIGN KEY (id_maestro) REFERENCES usuario(id)
     FOREIGN KEY (id_categoria) REFERENCES Categoria(id)
 );
 
@@ -76,6 +87,7 @@ CREATE TABLE transaccion (
     id_curso INT,
     monto DECIMAL(10,2),
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estatus BOOLEAN,-- estatus de la transaccion , rechazada o aceptada
     FOREIGN KEY (id_alumno) REFERENCES Usuario(id),
     FOREIGN KEY (id_curso) REFERENCES Curso(id)
 );
@@ -111,11 +123,39 @@ SELECT u.id, u.nombre_usuario, u.nombre, u.apellidos, u.email, tu.descripcion AS
 FROM usuario u
 JOIN tipo_usuario tu ON u.tipo_usuario = tu.id;
 
+
+-- ---------------------------------------
+-- para que el triger de la categoria creada funcione debe crearse esta view y a su vez la tabla de reporte categoria
+CREATE VIEW reporte_categorias_creadas AS
+SELECT ac.id_admin, u.nombre_usuario AS nombre_admin, COUNT(ac.id) AS total_categorias, 
+       DATE(ac.fecha_creacion) AS fecha_creacion
+FROM auditoria_categoria ac
+JOIN usuario u ON ac.id_admin = u.id
+GROUP BY ac.id_admin, u.nombre_usuario, DATE(ac.fecha_creacion);
+
+
 -- VIEWS --
 
 -- TRIGGERS -- 
 
--- OBRA EN PROGRESO--
+DELIMITER $$
+CREATE TRIGGER tg_categoria_creada
+AFTER INSERT ON categoria
+FOR EACH ROW
+BEGIN
+    DECLARE admin_nombre VARCHAR(100);
+    
+    -- Obtener el nombre del administrador que está creando la categoría
+    SELECT nombre_usuario INTO admin_nombre
+    FROM usuario
+    WHERE id = NEW.id_admin AND tipo_usuario = 1; -- 1 es el tipo para Administrador
+
+    -- Registrar la categoría creada en la tabla de auditoría
+    INSERT INTO auditoria_categoria (id_admin, nombre_admin, nombre_categoria)
+    VALUES (NEW.id_admin, admin_nombre, NEW.nombre);
+END$$
+DELIMITER ;
+
 
 -- TRIGGERS -- 
 
@@ -265,6 +305,8 @@ END$$
 
 DELIMITER ;
 
+-- STORE PROCEDURE --
+
 -- SP agregar inscripcion a un curso --
 
 DELIMITER $$
@@ -365,4 +407,3 @@ END $$
 DELIMITER ;
 
 -- STORE PROCEDURE--
-
