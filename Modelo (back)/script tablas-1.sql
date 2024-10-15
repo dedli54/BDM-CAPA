@@ -1,3 +1,6 @@
+CREATE DATABASE bdm-capa;
+
+USING DATABASE bdm-capa;
 -- TABLAS--
 
 -- LA PRIMER TABLA QUE SE DEBE CREAR ES LA DE TIPO DE USUARIOS
@@ -66,7 +69,7 @@ CREATE TABLE curso (
     contenido TEXT,
     id_maestro INT,
     id_categoria INT,
-    FOREIGN KEY (id_maestro) REFERENCES usuario(id)
+    FOREIGN KEY (id_maestro) REFERENCES usuario(id),
     FOREIGN KEY (id_categoria) REFERENCES Categoria(id)
 );
 
@@ -126,10 +129,10 @@ JOIN tipo_usuario tu ON u.tipo_usuario = tu.id;
 
 -- ---------------------------------------
 -- para que el triger de la categoria creada funcione debe crearse esta view y a su vez la tabla de reporte categoria
-CREATE VIEW reporte_categorias_creadas AS
+CREATE VIEW vw_reporte_categorias_creadas AS
 SELECT ac.id_admin, u.nombre_usuario AS nombre_admin, COUNT(ac.id) AS total_categorias, 
        DATE(ac.fecha_creacion) AS fecha_creacion
-FROM auditoria_categoria ac
+FROM reporte_categoria ac
 JOIN usuario u ON ac.id_admin = u.id
 GROUP BY ac.id_admin, u.nombre_usuario, DATE(ac.fecha_creacion);
 
