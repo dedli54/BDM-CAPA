@@ -1,2 +1,17 @@
 
 Lo que te mandé por wasap jsjs, mañana agrego más cosas y arreglo lo que se ocupa 
+
+Igualar htmls, mismos ID´s + cosas por camniar (Julián)
+
+Busqueda        - El otro no tiene ID´s
+chat            - 
+CursoComprar    - Su boton de comprar no tiene ID´s
+CursoVer        - Nombre actualizado * id´s nuevos
+EditUser        - 
+inicioSesion    - 
+Kardex          - 
+landPage        - 
+NewCurso        - Nombre actualizado * actualizar en las paginas que no necesiten
+Perfil          - Agregué boton de chat y para agregar nuevo curso 
+reportesUsers   - 
+reporteVeta     - 
