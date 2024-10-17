@@ -162,15 +162,17 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
             }
 
 
-                // Validar que cada nivel tenga texto o 
-                /* 
-                for (let i = 1; i <= numFields; i++) {
-
-                    const cDesc = document.getElementById('cDesc').value.trim();
-                    const img = document.getElementById('file${i}').files[0];
-
-                }*/
+                // Validar que cada nivel tenga texto o video
+                
         const numFieldsSelect = document.getElementById('numFields');
+
+        const numFields = parseInt(numFieldsSelect.value);
+        if (numFields <= 0) {
+            errores.push("a");
+
+        }
+
+
                     let hasValidInput = false; // Para verificar al menos un video
                     let allFieldsValid = true; // Para verificar todos los campos
                     let videos = 0; // Para verificar todos los campos
@@ -187,12 +189,12 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
                     }
 
                     if(fileValue){
-                        videos = videos +1;
+                        videos = videos + 1;
                     }
         
                     if (!textValue && !fileValue) {
                         allFieldsValid = false; // No hay texto ni archivo
-                        errores.push("Todo nivel debe tener texto o video");
+                        errores.push(`Nivel ${i} no tiene informacion`);
                     }
                 }
 
