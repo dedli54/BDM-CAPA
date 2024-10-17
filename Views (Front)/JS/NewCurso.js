@@ -1,4 +1,20 @@
 
+
+//Funcion para mostrar la imagen
+document.getElementById('foto').addEventListener('change', function(event) {
+    const file = event.target.files[0]; 
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewImage = document.getElementById('preview');
+            previewImage.src = e.target.result; // Asignar url a la imagen
+            previewImage.style.display = 'block'; 
+        }
+        reader.readAsDataURL(file); // Lee el archivo como una URL de datos
+    }
+});
+
 //Solo 10 numeros en telefono y 8 en las contraseñas
 document.getElementById('telefono').addEventListener('input', function() {
 
@@ -12,7 +28,17 @@ document.getElementById('telefono').addEventListener('input', function() {
     }
 });
 
-document.getElementById('contraseña').addEventListener('input', function() {
+document.getElementById('pw').addEventListener('input', function() {
+
+    const maxLength = 8;
+    const value = this.value;
+
+    if (value.length > maxLength) {
+        this.value = value.slice(0, maxLength);
+    }
+});
+
+document.getElementById('pw_conf').addEventListener('input', function() {
 
     const maxLength = 8;
     const value = this.value;
@@ -24,30 +50,28 @@ document.getElementById('contraseña').addEventListener('input', function() {
 
 
 
-
-
 document.getElementById('newUsuario').addEventListener('submit', function(event) {
     
     event.preventDefault();
 
-    const nombre = document.getElementById('nombre_usuario').value.trim();
+    const nombre = document.getElementById('nombre').value.trim();
     const email = document.getElementById('email').value.trim();
-    const pw = document.getElementById('contraseña').value.trim();
-    //const pw_conf = document.getElementById('pw_conf').value.trim();
+    const pw = document.getElementById('pw').value.trim();
+    const pw_conf = document.getElementById('pw_conf').value.trim();
 
     //columna 2
     const apellido = document.getElementById('apellido').value.trim();
     const telefono = document.getElementById('telefono').value.trim();
 
-    const img = document.getElementById('foto').files[0]; //input
+    const img = document.getElementById('foto').files[0];
 
-    const fecha = document.getElementById('fecha_nacimiento').value;
+    const fecha = document.getElementById('fecha').value;
     const genero = document.getElementById('genero').value;
-    const cuenta = document.getElementById('tipo_de_cuenta').value;
+    const cuenta = document.getElementById('cuenta').value;
 
     let errores = [];
 
-    if (nombre === "" || pw ===""  || apellido ==="" || telefono ===""|| email ==="" /* pwconf */) {
+    if (nombre === "" || pw ==="" || pw_conf ==="" || apellido ==="" || telefono ===""|| email ==="" ) {
         errores.push("Faltan campos por llenar");
     }
 
@@ -67,17 +91,17 @@ document.getElementById('newUsuario').addEventListener('submit', function(event)
         const fechaActual = new Date();
         fechaActual.setHours(0, 0, 0, 0);
 
-        if (fechaSeleccionada >= fechaActual) {
+        if (fechaSeleccionada > fechaActual) {
             errores.push("Fecha no valida");
         }
     } else {
         errores.push("Debes seleccionar una fecha de nacimiento");
     }
 
-    /*if(pw!=pw_conf){
+    if(pw!=pw_conf){
         errores.push("Las contraseñas deben coincidir");
 
-    }*/
+    }
 
     if (!img) {
         errores.push("Debes seleccionar una foto");
@@ -90,7 +114,7 @@ document.getElementById('newUsuario').addEventListener('submit', function(event)
         //Validaciones de la clase de las semana 4 (contraseña y correo)
 
         function validatePassword() {
-            var p = document.getElementById('contraseña').value,
+            var p = document.getElementById('pw').value,
                 errors = [];
             
             if (p.length !== 8) {

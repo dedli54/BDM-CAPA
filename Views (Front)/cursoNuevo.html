@@ -89,8 +89,8 @@
         </div>
 
         
-        <div class="card-body"> <!--  Datos curso  -->
-            <form id="newUsuario">
+        <div class="card-body"> <!--  Datos curso Ojo, se cambió el ID -->
+            <form id="dynamicForm"> 
                 <div class="row">
                     <!-- Columna 1 -->
                     <div class="col">
@@ -119,29 +119,29 @@
 
                     <!-- Columna 2 -->
                     <div class="col">
-                        <div class="mb-3">
+                        <div class="mb-3"> <!--   TO DO FRONT: Java que muestre u oculte informacion dependiendo     -->
                             <input type="checkbox" class="form-check-input" id="cGratis">
                             <label for="cTotal" class="form-label fs-5 subtitulos">Curso gratuito</label>
                         </div>
                         
-                        <div class="mb-3 ">
+                        <div class="mb-3 costo">
                             <label for="cTotal" class="form-label fs-5 subtitulos">Costo total:</label>
                             <input type="number" class="form-control rounded-5" id="cTotal" placeholder="Costo por todo el curso">
                         </div>
-                        <div class="mb-3 ">
+                        <div class="mb-3 costo">
                             <label for="cNivel" class="form-label fs-5 subtitulos">Costo por nivel:</label>
                             <input type="number" class="form-control rounded-5" id="cNivel" placeholder="Costo por todo el curso">
                         </div>
                         <div class="mb-3">
-                            <label for="genero" class="form-label fs-5 subtitulos">Categoria:</label>
-                                <select class="form-select rounded-5" id="genero">
+                            <label for="cCategoria" class="form-label fs-5 subtitulos">Categoria:</label>
+                                <select class="form-select rounded-5" id="cCategoria">
                                     <option selected>Categoria</option>
                                     <option value="1">Matematicas</option>
                                     <option value="2">Arte</option>
                                     <option value="3">Computo</option>
                                 </select>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 costo">
                             <label for="freeLvl" class="form-label fs-5 subtitulos">Niveles gratuitos:</label>
                                 <select class="form-select rounded-5" id="freeLvl">
                                     <option selected>0</option>
@@ -163,10 +163,16 @@
 
 
                 
-            </form>
+
+
+
+            <div class=" text-center">
+                <h3 class="subtitulos">Niveles</h3>
+            </div>
+
 
             <!--  Niveles curso  -->    <hr>
-            <form id="dynamicForm">
+            
                 <div class="mb-3">
                     <label for="numFields" class="form-label fs-5 subtitulos">Seleccione el total de niveles</label>
                     <select class="form-select" id="numFields">
@@ -186,7 +192,7 @@
                     <!-- Campos dinámicos serán insertados aquí -->
                 </div>
                 <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-dark">Enviar</button>
+                    <button type="submit" class="btn btn-dark">Guardar</button>
                 </div>
             </form>
         </div>
@@ -210,50 +216,6 @@
 
 
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const numFieldsSelect = document.getElementById('numFields');
-        const fieldsContainer = document.getElementById('fieldsContainer');
-
-        numFieldsSelect.addEventListener('change', function() {
-            const numFields = parseInt(this.value);
-            fieldsContainer.innerHTML = ''; // Limpia los campos actuales
-
-            for (let i = 1; i <= numFields; i++) {
-                const row = document.createElement('div');
-                row.classList.add('row', 'mb-3', 'form-field');
-                
-                row.innerHTML = `
-                <hr style="opacity:15%">
-                <div class="col-md-12">
-                        <label class="form-label fs-3 " >Nivel ${i}</label>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="text${i}" class="form-label fs-4">Texto ${i}</label>
-                        <textarea class="form-control textarea-md" id="text${i}" placeholder="Ingresa texto ${i}"></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="file${i}" class="form-label fs-4">Archivo ${i}</label>
-                        <input type="file" class="form-control" id="file${i}" accept="video/mp4,video/*">
-                    </div>
-                `;
-
-                fieldsContainer.appendChild(row);
-            }
-
-            // Mostrar los campos seleccionados
-            document.querySelectorAll('.form-field').forEach((field, index) => {
-                if (index < numFields) {
-                    field.style.display = 'flex';
-                } else {
-                    field.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
 <script src="JS/addCurso.js"></script>
 
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
