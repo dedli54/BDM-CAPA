@@ -1,15 +1,16 @@
 Notas para julian front
 
-en el chat poner el header / Navbar? Vava
+Listop - - - en el chat poner el header / Navbar? Vava
 
 (no tan importante) Intentar renombrar todos los archivos para que esten sincronizados al otro Proyecto
 por ejemplo lo de java script 
 
-hacer que todos los campos anden gual por ejemplo en el de nosotros esta el "Nombre" y en el otro esta "Nombre de usuario"
-son pendejadas pero para que este todo sincronizado entre los 2 fronts y el back no haya tanto pedo {empezando a revisar los IDs de los forms}
+Listo en IDs (revisando JS con michelle)        
+        -- hacer que todos los campos anden gual por ejemplo en el de nosotros esta el "Nombre" y en el otro esta "Nombre de usuario"
+        -- son pendejadas pero para que este todo sincronizado entre los 2 fronts y el back no haya tanto pedo {empezando a revisar los IDs de los forms}
 
-en perfil agregar un boton para que te mande al chat / Está en el Navbar pero vava comoquiera { LISTO TAMBIEN }
+Listop - - - en perfil agregar un boton para que te mande al chat / Está en el Navbar pero vava comoquiera { LISTO TAMBIEN }
 
-cambiar el nombre de los archivos pa que anden igual por ejemplo nosotros "Crear curso" ellos "Nuevo curso" mas que nada para que no nos confundamos a la mera hora jsjsjs / { LISTO MASO }
+Listo maso - - - cambiar el nombre de los archivos pa que anden igual por ejemplo nosotros "Crear curso" ellos "Nuevo curso" mas que nada para que no nos confundamos a la mera hora jsjsjs / { LISTO MASO }
 
-pedirle a michelle que haga la ventana de editar usuario / Ya la tenemos, solo falta el Navbar
+Listo - - - pedirle a michelle que haga la ventana de editar usuario / Ya la tenemos, solo falta el Navbar

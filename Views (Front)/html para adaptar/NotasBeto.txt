@@ -15,3 +15,6 @@ NewCurso        - Nombre actualizado * actualizar en las paginas que no necesite
 Perfil          - Agregué boton de chat y para agregar nuevo curso 
 reportesUsers   - 
 reporteVeta     - 
+
+
+navbarDropdown acá se llenaría con las categorias en todos los navbars

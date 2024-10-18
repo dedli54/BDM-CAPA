@@ -162,46 +162,45 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
             }
 
 
-                // Validar que cada nivel tenga texto o video
-                
+        // Validar que cada nivel tenga texto o video      
         const numFieldsSelect = document.getElementById('numFields');
 
-        const numFields = parseInt(numFieldsSelect.value);
-        if (numFields <= 0) {
-            errores.push("a");
+        
+        
 
+            // Validacion de que todos los niveles tengan info
+            const numFields = parseInt(numFieldsSelect.value);
+
+        let allFieldsValid = true; // Para verificar todos los campos
+        let videos = 0; // Para verificar todos los campos
+        
+
+        for (let i = 1; i <= numFieldsSelect.value; i++) {
+                const textInput = document.getElementById(`text${i}`);
+                const fileInput = document.getElementById(`file${i}`);
+                const textValue = textInput.value.trim();
+                const fileValue = fileInput.files.length > 0;
+    
+                
+
+                if(fileValue){
+                    videos = videos + 1; //Cuenta los videos
+                }
+    
+                if (!textValue && !fileValue) {
+                    allFieldsValid = false; // No hay texto ni archivo
+                    errores.push(`Nivel ${i} no tiene informacion`);
+                }
         }
 
+        if (numFields <= 0) {
+            errores.push("Selecciona una cantidad de niveles");
 
-                    let hasValidInput = false; // Para verificar al menos un video
-                    let allFieldsValid = true; // Para verificar todos los campos
-                    let videos = 0; // Para verificar todos los campos
-            
+        }else
+            if (videos === 0) {
+                    errores.push("Debe haber al menos un video");
 
-                for (let i = 1; i <= numFieldsSelect.value; i++) {
-                    const textInput = document.getElementById(`text${i}`);
-                    const fileInput = document.getElementById(`file${i}`);
-                    const textValue = textInput.value.trim();
-                    const fileValue = fileInput.files.length > 0;
-        
-                    if (textValue || fileValue) {
-                        hasValidInput = true; // Hay al menos un video o texto
-                    }
-
-                    if(fileValue){
-                        videos = videos + 1;
-                    }
-        
-                    if (!textValue && !fileValue) {
-                        allFieldsValid = false; // No hay texto ni archivo
-                        errores.push(`Nivel ${i} no tiene informacion`);
-                    }
-                }
-
-                if (videos === 0) {
-                    errores.push("No hay videos");
-
-                }
+            }
 
     
 
