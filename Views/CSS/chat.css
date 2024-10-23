@@ -1,0 +1,104 @@
+.card-chat{
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 20px;
+    border-color: #343a4000;
+    box-shadow: 3px 3px 5px 5px #343a40;
+    margin: 3%;
+}
+.busqueda-input{
+    color: #f2f2f2;
+    background-color: #343a40;
+}
+
+button{
+    width: 20%;
+    height: 20%;
+    background-color: #343a40;
+    color: #f2f2f2;
+}
+
+button:hover{
+    background-color: #f2f2f2;
+    color: #343a40; 
+}
+
+h3{
+    text-align: center;
+    padding: 5%;
+}
+.mensajes{
+    display: flex;
+    align-items:center;
+    box-shadow: 3px 3px 3px #85888d;
+    border-radius: 3%;
+    margin: 4%;
+    padding: 0%;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.mensajes:hover{
+    background-color: #85888d;
+}
+
+.profesor{
+    margin: 5%;
+    box-shadow: 2px 2px 3px 3px #343a40;
+    border-radius: 3%;
+}
+
+.propio{
+    margin: 5%;
+    background-color: #85888d;
+    box-shadow: 3px 3px #343a40;
+    text-align: end;
+    align-items: end;
+    border-radius: 3%;
+}
+
+.texto{
+    display: flex;
+    margin: 5%;
+    text-align: center;
+    color: #f2f2f2;
+    border-radius:  5%;
+    background-color: #343a40;
+}
+
+.enviar{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0%;
+    padding: 0%;
+}
+
+.enviar > input{
+    height: 20%;
+    width: 50%;
+}
+
+
+.mensaje{
+    box-shadow: 3px 3px 5px 5px #85888d;
+}
+
+footer {
+    color: white;
+    padding: 1rem 0;
+}
+
+.cont-Cursos{
+
+    padding: auto;
+}
+
+.rowCursos{
+
+    padding: 2%; gap: 10px;
+}
+
+.imgCard{
+    object-fit: cover;
+}
