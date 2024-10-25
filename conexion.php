@@ -2,10 +2,10 @@
 
 <?php
 class Conexion {
-    private $host = 'localhost';
+    private $host = 'localhost'; //le cambie el host y contraseña y user por mi pc recuerden cambiarla cuando prueben ustedes
     private $dbname = 'BDM'; 
     private $username = 'root'; // Cambia esto según tu configuración
-    private $password = ''; // Deja vacío si no tienes contraseña en MySQL (por defecto en XAMPP)
+    private $password = ''; // Deja vacío si no tienes contraseña en MySQL (por defecto en XAMPP) 
     private $charset = 'utf8';
     private $pdo;
 
