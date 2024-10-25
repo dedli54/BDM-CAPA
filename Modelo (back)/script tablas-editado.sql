@@ -1,6 +1,6 @@
 CREATE DATABASE BDM;
 
-USING DATABASE BDM;
+use BDM;
 
 /*
 usando workbech, además no se pudo crear el trigger: tg_categoria_creada
@@ -166,6 +166,7 @@ BEGIN
     VALUES (NEW.id_admin, admin_nombre, NEW.nombre);
 END$$
 DELIMITER ;
+-- Ocupa que agreguen el id_admin a categoria si quieren que este trigger funcione
 
 
 -- TRIGGERS -- 
@@ -214,7 +215,7 @@ BEGIN
             INSERT INTO instructor (id, biografia, cuenta_bancaria)
             VALUES (LAST_INSERT_ID(), p_biografia, p_cuenta_bancaria);
         END IF;
-    END IF;
+    END IF;
 END$$
 
 DELIMITER ;
@@ -459,9 +460,11 @@ END$$
 DELIMITER ;
 
 -- Así se usa: CALL sp_login('admin@example.com', 'password123');
-select * from usuario
+select * from usuario;
 
+-- Por que hay un segundo sp_crear_usuario lol
 --SP 
+DELIMITER $$
 
 CREATE PROCEDURE sp_crear_usuario(
     IN p_nombre_usuario VARCHAR(100),
@@ -499,7 +502,10 @@ BEGIN
         IF p_tipo_usuario = 2 THEN
             INSERT INTO instructor (id, biografia, cuenta_bancaria)
             VALUES (LAST_INSERT_ID(), p_biografia, p_cuenta_bancaria);
-        END IF;
-    END IF;
+		END IF;
+    END IF;
 END$$
+
+DELIMITER ;
+
 
