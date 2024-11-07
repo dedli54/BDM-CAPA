@@ -473,7 +473,8 @@ DELIMITER ;
 -- Así se usa: CALL sp_login('admin@example.com', 'password123');
 select * from usuario
 
---SP 
+-- SP 
+DELIMITER //
 
 CREATE PROCEDURE sp_crear_usuario(
     IN p_nombre_usuario VARCHAR(100),
@@ -517,7 +518,7 @@ END$$
 
 DELIMITER //
 
---Nomas agregas este SP a la base de datos y tambien cambie el validacion_usuario.php para que llame a este SP
+-- Nomas agregas este SP a la base de datos y tambien cambie el validacion_usuario.php para que llame a este SP
 
 -- Estados -1: Cuenta bloqueada, 0: Contraseña incorrecta, 1: Inicio de sesion exitoso
 CREATE PROCEDURE sp_consultar_usuario(
