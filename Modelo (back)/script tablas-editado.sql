@@ -431,9 +431,9 @@ DELIMITER ;
 
 -- STORE PROCEDURE--
 
--- PROCEDURE PARA EL LOGIN 
+-- PROCEDURE PARA EL LOGIN con lo de 3 intentos actualizado
 
-DELIMITER $$
+DELIMITER //
 
 CREATE PROCEDURE sp_login(
     IN p_email VARCHAR(100),
@@ -442,21 +442,33 @@ CREATE PROCEDURE sp_login(
 BEGIN
     DECLARE v_id INT;
     DECLARE v_tipo_usuario TINYINT;
+    DECLARE v_estado INT;
 
-    -- Verifica si el email y la contraseña son correctos
-    SELECT id, tipo_usuario INTO v_id, v_tipo_usuario
-    FROM usuario
-    WHERE email = p_email AND contrasena = p_contrasena;
+    -- Call sp_consultar_usuario to verify user status and password
+    CALL sp_consultar_usuario(p_email, p_contrasena, v_estado);
 
-    -- Si se encuentra un usuario, retorna el id y tipo de usuario
-    IF v_id IS NOT NULL THEN
-        SELECT v_id AS id, v_tipo_usuario AS tipo_usuario;
-    ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email o contraseña incorrectos';
+    -- Check the result of sp_consultar_usuario
+    IF v_estado = 1 THEN
+        -- If successful (v_estado = 1), proceed with the main login logic
+        SELECT id, tipo_usuario INTO v_id, v_tipo_usuario
+        FROM usuario
+        WHERE email = p_email AND contrasena = p_contrasena;
+
+        -- If user is found, return the id and user type
+        IF v_id IS NOT NULL THEN
+            SELECT v_id AS id, v_tipo_usuario AS tipo_usuario;
+        ELSE
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email o contraseña incorrectos';
+        END IF;
+    ELSEIF v_estado = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Contraseña incorrecta';
+    ELSEIF v_estado = -1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cuenta bloqueada';
     END IF;
-END$$
+END //
 
 DELIMITER ;
+
 
 -- Así se usa: CALL sp_login('admin@example.com', 'password123');
 select * from usuario
@@ -502,4 +514,60 @@ BEGIN
         END IF;
     END IF;
 END$$
+
+DELIMITER //
+
+--Nomas agregas este SP a la base de datos y tambien cambie el validacion_usuario.php para que llame a este SP
+
+-- Estados -1: Cuenta bloqueada, 0: Contraseña incorrecta, 1: Inicio de sesion exitoso
+CREATE PROCEDURE sp_consultar_usuario(
+    IN p_email VARCHAR(100),
+    IN p_contrasena VARCHAR(255),
+    OUT p_estado INT
+    
+)
+BEGIN
+    DECLARE v_contrasena_db VARCHAR(255);
+    DECLARE v_intentos_fallidos INT;
+    DECLARE v_estado INT;
+
+    -- Verificar si el usuario existe y obtener su estado y contraseña
+    SELECT contrasena, intentos_fallidos, estado 
+    INTO v_contrasena_db, v_intentos_fallidos, v_estado 
+    FROM usuario 
+    WHERE email = p_email;
+
+    -- Checar si el usuario esta habilitado
+    IF v_estado = 0 THEN
+        SET p_estado = -1; -- Usuario deshabilitado
+    ELSE
+        -- Validar la contraseña
+        IF v_contrasena_db = p_contrasena THEN
+            -- Si la contra es correcta reinicia el contador de intentos y retorna exito
+            UPDATE usuario 
+            SET intentos_fallidos = 0 
+            WHERE email = p_email;
+            SET p_estado = 1; -- Inicio de sesion exitoso
+        ELSE
+            -- Si la contra esta equivocada agrega +1 a los intento fallidos
+            SET v_intentos_fallidos = v_intentos_fallidos + 1;
+            UPDATE usuario 
+            SET intentos_fallidos = v_intentos_fallidos 
+            WHERE email = p_email;
+
+            -- Checar si se debe deshabilitar a el usuaro
+            IF v_intentos_fallidos >= 3 THEN
+                UPDATE usuario 
+                SET estado = 0 
+                WHERE email = p_email;
+                SET p_estado = -1; -- Usuario deshabilitado despues de 3 intentos
+            ELSE
+                SET p_estado = 0; -- Intento fallido, pero la cuenta sigue activa
+            END IF;
+        END IF;
+    END IF;
+END //
+
+DELIMITER ;
+
 
