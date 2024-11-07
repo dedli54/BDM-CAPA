@@ -2,7 +2,7 @@ CREATE DATABASE BDM;
 
 USING DATABASE BDM;
 
-/*
+/* test
 usando workbech, además no se pudo crear el trigger: tg_categoria_creada
 CREATE DATABASE `bdm-capa`;
 
