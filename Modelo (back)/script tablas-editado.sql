@@ -175,6 +175,7 @@ DELIMITER ;
 -- SP para crear usuarios
 DROP PROCEDURE sp_crear_usuario
 
+/*
 DELIMITER $$
 
 CREATE PROCEDURE sp_crear_usuario(
@@ -218,6 +219,53 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+*/
+DELIMITER //
+
+CREATE PROCEDURE sp_crear_usuario(
+    IN p_nombre_usuario VARCHAR(100),
+    IN p_nombre VARCHAR(100),
+    IN p_apellidos VARCHAR(100),
+    IN p_email VARCHAR(100),
+    IN p_contrasena VARCHAR(255),
+    IN p_tipo_usuario TINYINT,
+    IN p_foto BLOB,
+    IN p_fecha_nacimiento DATE,
+    IN p_telefono BIGINT,
+    IN p_biografia TEXT,
+    IN p_cuenta_bancaria VARCHAR(50)
+)
+BEGIN
+    
+    IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El formato del email no es válido';
+    END IF;
+
+IF p_contrasena NOT REGEXP '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.])[A-Za-z\\d@$!%*?&.]{8,}$' THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La contraseña no cumple con los requisitos: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial';
+END IF;
+
+
+    
+    IF EXISTS (SELECT 1 FROM usuario WHERE email = p_email) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El email ya está en uso';
+    ELSE
+        
+        INSERT INTO usuario (nombre_usuario, nombre, apellidos, email, contrasena, tipo_usuario, foto, fecha_nacimiento, telefono)
+        VALUES (p_nombre_usuario, p_nombre, p_apellidos, p_email, p_contrasena, p_tipo_usuario, p_foto, p_fecha_nacimiento, p_telefono);
+
+        
+        IF p_tipo_usuario = 2 THEN
+            INSERT INTO instructor (id, biografia, cuenta_bancaria)
+            VALUES (LAST_INSERT_ID(), p_biografia, p_cuenta_bancaria);
+        END IF;
+    END IF;
+END //
+
+DELIMITER ;
+
+
 
 
 -- SP para editar usuarios
