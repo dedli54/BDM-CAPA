@@ -240,7 +240,7 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
         }
     });
 
-
+/*
 function enviarPhpNewCurso(datos){
         const formData = new FormData();
 
@@ -265,6 +265,43 @@ function enviarPhpNewCurso(datos){
         .then(data => {
             if (data.success) {
                 alert('Curso creado exitosamente');
+
+
+
+                // Obtener el número de niveles
+                const numFields = parseInt(document.getElementById('numFields').value);
+
+                // Crear un bucle para enviar cada nivel
+                for (let i = 1; i <= numFields; i++) {
+                    const textInput = document.getElementById(`text${i}`).value.trim();
+                    const fileInput = document.getElementById(`file${i}`).files[0];
+                    
+                    const formDataNivel = new FormData();
+                    formDataNivel.append('p_texto', textInput || '');  // Si no hay texto, enviar cadena vacía
+                    formDataNivel.append('p_video', fileInput || '');  // Si no hay archivo, enviar cadena vacía
+                    formDataNivel.append('p_numero', i); // Número de nivel
+
+                    // Enviar cada nivel al procedimiento almacenado
+                    fetch('../Controllers/addNivelesCurso.php', {
+                        method: 'POST',
+                        body: formDataNivel
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('Error al agregar nivel ' + i + ': ' + data.message);
+                        }else{
+                            alert('Nivel agregado: ' + i + ': ');
+
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al enviar nivel ' + i, error);
+                        alert('Hubo un error al agregar el nivel ' + i);
+                    });
+                }
+
+
                 // Redirigir si es necesario
                 // window.location.href = 'inicioSesion.html';
             } else {
@@ -276,4 +313,71 @@ function enviarPhpNewCurso(datos){
             alert('Hubo un error al enviar el formulario.');
         });
 
+}
+ */
+function enviarPhpNewCurso(datos) {
+    const formData = new FormData();
+
+    formData.append('p_titulo', datos.cName);
+    formData.append('p_descripcion', datos.cDesc);
+    formData.append('p_precio', datos.tot);
+    formData.append('p_contenido', datos.cDesc);
+    formData.append('p_id_maestro', datos.idProfe);
+    formData.append('p_id_categoria', datos.csCategoria);
+
+    if (datos.img) {
+        formData.append('p_foto', datos.img);
+    }
+
+    // Enviar datos para crear el curso
+    fetch('../Controllers/crearCurso.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Curso creado exitosamente');
+
+            // Obtener el número de niveles
+            const numFields = parseInt(document.getElementById('numFields').value);
+
+            // Crear un bucle para enviar cada nivel
+            for (let i = 1; i <= numFields; i++) {
+                const textInput = document.getElementById(`text${i}`).value.trim();
+                const fileInput = document.getElementById(`file${i}`).files[0];
+
+                const formDataNivel = new FormData();
+                formDataNivel.append('p_texto', textInput || '');  // Si no hay texto, enviar cadena vacía
+                formDataNivel.append('p_video', fileInput || '');  // Si no hay archivo, enviar cadena vacía
+                formDataNivel.append('p_numero', i); // Número de nivel
+
+                // Enviar cada nivel al procedimiento almacenado
+                fetch('../Controllers/addNivelesCurso.php', {
+                    method: 'POST',
+                    body: formDataNivel
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(`Respuesta nivel ${i}:`, data);  // Ver la respuesta completa
+                    if (!data.success) {
+                        alert('Error al agregar nivel ' + i + ': ' + data.message);
+                    } else {
+                        alert('Nivel agregado: ' + i);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar nivel ' + i, error);
+                    alert('Hubo un error al agregar el nivel ' + i);
+                });
+            }
+
+        } else {
+            alert('Error al crear el curso: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error al enviar datos:', error);
+        alert('Hubo un error al enviar el formulario.');
+    });
 }

@@ -81,6 +81,9 @@ CREATE TABLE curso (
     FOREIGN KEY (id_categoria) REFERENCES Categoria(id)
 );
 
+
+
+
 -- Esta tabla guardara los datos de que alumno se inscribio a tal curso
 CREATE TABLE inscripcion (
     id_alumno INT,
@@ -223,7 +226,7 @@ DELIMITER ;
 */
 DELIMITER //
 
-CREATE PROCEDURE sp_crear_usuario(
+CREATE PROCEDURE sp_crear_usuario( -- el chido, el que jala
     IN p_nombre_usuario VARCHAR(100),
     IN p_nombre VARCHAR(100),
     IN p_apellidos VARCHAR(100),
@@ -464,6 +467,8 @@ END $$
 DELIMITER ;
 
 -- SP agregar curso para maestro --
+
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_agregar_curso (
@@ -472,13 +477,15 @@ CREATE PROCEDURE sp_agregar_curso (
     IN p_precio DECIMAL(10,2),
     IN p_contenido TEXT,
     IN p_id_maestro INT,
-    IN p_id_categoria INT
+    IN p_id_categoria INT,
+    IN p_foto BLOB
 )
 BEGIN
     
-    INSERT INTO curso (titulo, descripcion, precio, contenido, id_maestro, id_categoria)
-    VALUES (p_titulo, p_descripcion, p_precio, p_contenido, p_id_maestro, p_id_categoria);
+    INSERT INTO curso (titulo, descripcion, precio, contenido, id_maestro, id_categoria, foto)
+    VALUES (p_titulo, p_descripcion, p_precio, p_contenido, p_id_maestro, p_id_categoria,p_foto);
 END $$
+
 
 DELIMITER ;
 
@@ -665,5 +672,38 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+
+
+
+-- 08/11/2024 Julian: Para organizarnos mejor puse acá lo nuevo que agregue, además del cambio en la tabla de cursos para guardar imagen
+-- NIVELES DEL CURSO
+CREATE TABLE nivelesCurso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    video VARCHAR(255),
+    texto TEXT,
+    numeroNivel int,
+    id_curso INT,
+    FOREIGN KEY (id_curso) REFERENCES curso(id)
+);
+
+-- Procedure para crear niveles
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_niveles_curso (
+    IN p_video VARCHAR(255),
+    IN p_texto TEXT,
+    IN p_numero INT 
+)
+BEGIN
+    
+    
+END $$
+
+
+DELIMITER ;
+
 
 
