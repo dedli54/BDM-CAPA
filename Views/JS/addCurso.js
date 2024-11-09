@@ -107,6 +107,8 @@ document.getElementById('cNivel').addEventListener('input', function(event) {
 
 
 
+
+
 //Validar el curso
 document.getElementById('dynamicForm').addEventListener('submit', function(event) {
     
@@ -139,8 +141,8 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
                 errores.push("Faltó informacion de costos");
             }else{
 
-                const tot = cTotal.parseFloat();
-                const lvl = cNivel.parseFloat();
+                const tot = parseFloat(cTotal);
+                const lvl = parseFloat(cNivel);
 
                 if(lvl >= tot)
                 errores.push("Costo de nivel no puede ser menor");
@@ -208,9 +210,70 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
         if (errores.length > 0) {
             alert(errores.join("\n"));
     
-        } else {
+        } else { //3raE: terminó las validaciones del JS ahora manda a llamar al php
+
+            // parseInt(localStorage.getItem('idProfe')) || 1; 
+            const idProfe = parseInt(1); //3raE: obtener despues del localstorage
+            // categoria llenar combobox con SP de categorias
+            const csCategoria = parseInt(categoria);
+            const tot = parseFloat(cTotal);
+
+            enviarPhpNewCurso({cName,cDesc,img,tot,idProfe,csCategoria});
+
+            /*
+            
+            CREATE PROCEDURE sp_agregar_curso (
+                IN p_titulo VARCHAR(255),
+                IN p_descripcion TEXT,
+                IN p_precio DECIMAL(10,2),        --cTotal
+                IN p_contenido TEXT,            --cDesc
+                IN p_id_maestro INT,
+                IN p_id_categoria INT,
+                IN p_foto BLOB 
+            
+            */
+
+
             alert("Curso creado");
             //window.location.href = 'inicioSesion.html';
             //event.target.submit();
         }
     });
+
+
+function enviarPhpNewCurso(datos){
+        const formData = new FormData();
+
+        formData.append('p_titulo', datos.cName);
+        formData.append('p_descripcion', datos.cDesc);
+        formData.append('p_precio', datos.tot);
+        formData.append('p_contenido', datos.cDesc);
+        formData.append('p_id_maestro', datos.idProfe);
+        formData.append('p_id_categoria', datos.csCategoria);
+
+        if (datos.img) {
+            formData.append('p_foto', datos.img);
+        }
+
+        // Aquí se enviarían los datos del fetch y etc.
+
+        fetch('../Controllers/crearCurso.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Curso creado exitosamente');
+                // Redirigir si es necesario
+                // window.location.href = 'inicioSesion.html';
+            } else {
+                alert('Error al crear el curso: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error al enviar datos:', error);
+            alert('Hubo un error al enviar el formulario.');
+        });
+
+}
