@@ -9,7 +9,7 @@ CREATE DATABASE `bdm-capa`;
 USE `bdm-capa`;
 */
 
--- TABLAS--
+-- TABLAS-- 
 
 -- LA PRIMER TABLA QUE SE DEBE CREAR ES LA DE TIPO DE USUARIOS
 
@@ -21,9 +21,19 @@ CREATE TABLE tipo_usuario (
 -- Insertar los roles (1: Admin, 2: Instructor, 3: Alumno)
 INSERT INTO tipo_usuario (id, descripcion)
 VALUES
-    (1, 'Administrador'),
+    (1, 'Alumno'),
     (2, 'Instructor'),
-    (3, 'Alumno');
+    (3, 'Administrador');
+
+/* EDITE LA TABLA PORQUE LA FUNCIONALIDAD DEL PROYECTO ES 1 Alumno, 2 Profe y 3 Admin
+UPDATE tipo_usuario 
+SET descripcion = 'Alumno'
+WHERE id = 1;
+
+UPDATE tipo_usuario 
+SET descripcion = 'Administrador'
+WHERE id = 3; -- select * from tipo_usuario
+*/
     
 -- Se cambio la tabla por que se me hizo muy innecesario tener 2 tablas admin y mejor agrege como campo no obligatorio biografia  cuenta bancaria por si es un usuario tipo instructor
 CREATE TABLE usuario (
@@ -67,21 +77,26 @@ CREATE TABLE reporte_categoria (
     FOREIGN KEY (id_admin) REFERENCES usuario(id)
 );
 
+alter table curso
+add column fe_Creacion DATETIME DEFAULT CURRENT_TIMESTAMP ;
+
 
 -- Cursos creados por maestros
 CREATE TABLE curso (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     descripcion TEXT,
+    status BOOL DEFAULT 1,
+    foto BLOB,
     precio DECIMAL(10,2),
     contenido TEXT,
     id_maestro INT,
     id_categoria INT,
+    niveles INT DEFAULT 1, -- recien agregado
+    fe_Creacion DATETIME DEFAULT CURRENT_TIMESTAMP, -- same
     FOREIGN KEY (id_maestro) REFERENCES usuario(id),
     FOREIGN KEY (id_categoria) REFERENCES Categoria(id)
 );
-
-
 
 
 -- Esta tabla guardara los datos de que alumno se inscribio a tal curso
@@ -100,7 +115,7 @@ CREATE TABLE transaccion (
     id_alumno INT,
     id_curso INT,
     monto DECIMAL(10,2),
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- fecha de compra igual a fecha de la inscripcion
     estatus BOOLEAN,-- estatus de la transaccion , rechazada o aceptada
     FOREIGN KEY (id_alumno) REFERENCES Usuario(id),
     FOREIGN KEY (id_curso) REFERENCES Curso(id)
@@ -116,11 +131,12 @@ CREATE TABLE comentario (
     FOREIGN KEY (id_alumno) REFERENCES Usuario(id), -- Referenciamos al alumno que hizo el comentario
     FOREIGN KEY (id_curso) REFERENCES Curso(id) -- referenciamos a que curso se vera el comentario
 );
-
+-- drop table kardex
 CREATE TABLE kardex (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_alumno INT,
     id_curso INT,
+    lvl_Actual INT DEFAULT 0, -- nivel en el que se encuentra
     calificacion DECIMAL(4,2),
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_alumno) REFERENCES Usuario(id),
@@ -690,6 +706,8 @@ CREATE TABLE nivelesCurso (
 
 -- Procedure para crear niveles
 
+DROP PROCEDURE IF EXISTS sp_niveles_curso;
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_niveles_curso (
@@ -698,12 +716,300 @@ CREATE PROCEDURE sp_niveles_curso (
     IN p_numero INT 
 )
 BEGIN
+
+DECLARE idCurso  INT;
+SET idCurso = (SELECT max(id) FROM curso); 
+
+ insert into nivelesCurso (video,texto,numeroNivel,id_curso)
+ values (p_video,p_texto,p_numero, idCurso);
     
     
 END $$
 
 
 DELIMITER ;
+-- select * from nivelesCurso
+-- CALL sp_niveles_curso('','','');
 
+
+
+-- Views de reportes
+
+/* --DATOS DE RELLENO
+
+-- Inserciones en la tabla inscripcion
+INSERT INTO inscripcion (id_alumno, id_curso)
+VALUES 
+    (1, 1), -- Alumno con id 1 inscrito en el curso con id 1
+    (2, 1); -- Alumno con id 2 inscrito en el curso con id 1
+
+-- Inserciones en la tabla transaccion
+INSERT INTO transaccion (id_alumno, id_curso, monto, estatus)
+VALUES 
+    (1, 1, 120.00, TRUE), -- Transacción aceptada para alumno 1 en curso 1
+    (2, 1, 120.00, FALSE); -- Transacción rechazada para alumno 2 en curso 1
+
+-- Inserciones en la tabla comentario
+INSERT INTO comentario (id_alumno, id_curso, texto)
+VALUES 
+    (1, 1, 'Muy buen curso, aprendí mucho.'),
+    (2, 1, 'Interesante, aunque me gustaría ver más ejemplos.');
+
+-- Inserciones en la tabla kardex
+INSERT INTO kardex (id_alumno, id_curso, lvl_Actual, calificacion)
+VALUES 
+    (1, 1, 2, 88.50), -- Alumno con id 1 en nivel 2, calificación 88.50 en curso 1
+    (2, 1, 1, 92.00); -- Alumno con id 2 en nivel 1, calificación 92.00 en curso 1
+
+*/
+
+-- |||||||||||||||||||||||||||||||||||||||||||||| -VISTAS PARA REPORTES- ||||||||||||||||||||||||||||||||||||||||||||||
+
+/*
+DROP VIEW IF EXISTS vista_Kardex;
+DROP VIEW IF EXISTS vista_ResumenCurso;
+DROP VIEW IF EXISTS vista_AlumnosInscritos;
+DROP VIEW IF EXISTS vista_AlumnoRpt;
+DROP VIEW IF EXISTS vista_InstructorRpt;
+
+*/
+
+
+-- Vista Kardex
+
+CREATE VIEW IF NOT EXISTS vista_Kardex AS
+SELECT I.id_alumno,
+	   C.titulo AS Nombre_de_curso,
+    C.status AS Curso_status,
+	   Cat.id AS Categoria_ID,
+	   Cat.nombre AS Categoria,
+    CASE 
+        WHEN K.lvl_Actual >= C.niveles THEN 1 
+        ELSE 0
+    END AS Curso_terminado,
+    I.fecha_inscripcion AS Fecha_de_inscripcion,
+    K.fecha AS Ultima_fecha, -- Ultima fecha que cursó algun nivel
+    K.lvl_Actual AS Niveles_tomados,
+    C.niveles AS Niveles_totales
+FROM curso C 
+JOIN categoria cat ON C.id_categoria = cat.id
+JOIN inscripcion I ON I.id_curso = C.id
+JOIN transaccion T ON t.id_curso = C.id AND T.id_alumno = I.id_alumno
+JOIN kardex K ON K.id_curso = c.id AND K.id_alumno = I.id_alumno;
+
+-- vista ventas por curso
+
+CREATE VIEW IF NOT EXISTS vista_ResumenCurso AS
+SELECT  C.id AS ID_Curso,
+		C.id_maestro AS id_maestro,
+		C.titulo AS Nombre,
+    C.status AS Curso_st,
+		C.fe_Creacion AS Fecha_creacion,
+		CAT.id AS Categoria_ID,
+		CAT.nombre AS Categoria,
+		COUNT(I.id_alumno) AS Alumnos_inscritos,
+		IFNULL(SUM(T.monto), 0) AS Ingresos_totales
+FROM curso C
+JOIN categoria CAT ON C.id_categoria = CAT.id
+LEFT JOIN inscripcion I ON I.id_curso = C.id
+LEFT JOIN  transaccion T ON T.id_curso = C.id AND T.estatus = TRUE
+GROUP BY C.id;
+
+-- Vista ventas por alumno (trans individuales)
+
+
+CREATE VIEW IF NOT EXISTS vista_AlumnosInscritos AS
+SELECT I.id_alumno,
+    C.titulo AS Curso,
+    C.status AS Curso_st,
+    U.nombre AS Alumno,
+    K.lvl_Actual AS Nivel_actual,
+    I.fecha_inscripcion AS Inscripcion,
+    T.monto AS Pago
+    -- T.forma_pago AS Forma_de_pago -- Aun no está en la tabla
+FROM curso C
+JOIN inscripcion I ON I.id_curso = C.id
+JOIN usuario U ON U.id = I.id_alumno
+LEFT JOIN kardex K ON K.id_curso = C.id AND K.id_alumno = I.id_alumno
+LEFT JOIN transaccion T ON T.id_curso = C.id AND T.id_alumno = I.id_alumno AND T.estatus = TRUE;
+
+
+-- Info para admin de alumnos 
+CREATE VIEW IF NOT EXISTS vista_AlumnoRpt AS
+SELECT U.id AS ID,
+    CONCAT(U.nombre, ' ', U.apellidos) AS Nombre,
+    U.fecha_creacion AS Fecha_ingreso,
+    COUNT(I.id_curso) AS Cursos_inscritos,
+    ROUND((SUM(
+			CASE 
+				WHEN K.lvl_Actual = C.niveles THEN 1
+				ELSE 0
+			END) / COUNT(I.id_curso)) * 100, 2
+    ) AS Porcentaje_terminados
+FROM usuario U
+LEFT JOIN inscripcion I ON I.id_alumno = U.id
+LEFT JOIN curso C ON C.id = I.id_curso
+LEFT JOIN kardex K ON K.id_alumno = U.id AND K.id_curso = C.id
+WHERE  U.tipo_usuario = 1  -- Alumno 
+GROUP BY  U.id; 
+
+-- ------------------ select * from usuario
+
+CREATE VIEW IF NOT EXISTS vista_InstructorRpt AS
+SELECT 
+    U.id AS ID,
+    CONCAT(U.nombre, ' ', U.apellidos) AS Nombre,
+    U.fecha_creacion AS Fecha_ingreso,
+    COUNT(DISTINCT C.id) AS Cursos_totales,
+    IFNULL(SUM(T.monto), 0) AS Ganancias
+FROM usuario U
+LEFT JOIN curso C ON C.id_maestro = U.id
+LEFT JOIN transaccion T ON T.id_curso = C.id AND T.estatus = TRUE
+WHERE U.tipo_usuario = 2  -- Instructor
+GROUP BY U.id; 
+    
+--
+-- PROCEDURES PARA LAS VENTANAS HTML
+
+-- drop procedure if exists sp_kardex_filtros
+
+
+-- select id,nombre,tipo_usuario from usuario WHERE tipo_usuario = 1;
+
+/*Más datos de relleno para pruebas*/
+/*
+INSERT INTO inscripcion (id_alumno, id_curso, fecha_inscripcion) VALUES
+    (3, 2, '2024-01-15'),
+    (3, 3, '2024-02-10'),
+    (6, 6, '2024-03-05'),
+    (6, 8, '2024-04-01'),
+    (8, 2, '2024-05-20'),
+    (8, 6, '2024-06-15'),
+    (9, 3, '2024-07-25'),
+    (9, 8, '2024-08-30');
+    
+    INSERT INTO transaccion (id_alumno, id_curso, monto, fecha, estatus) VALUES
+    (3, 2, 100.00, '2024-01-15', TRUE),
+    (3, 3, 150.00, '2024-02-10', TRUE),
+    (6, 6, 200.00, '2024-03-05', TRUE),
+    (6, 8, 250.00, '2024-04-01', TRUE),
+    (8, 2, 100.00, '2024-05-20', TRUE),
+    (8, 6, 200.00, '2024-06-15', TRUE),
+    (9, 3, 150.00, '2024-07-25', TRUE),
+    (9, 8, 250.00, '2024-08-30', TRUE);
+    
+    INSERT INTO kardex (id_alumno, id_curso, lvl_Actual, calificacion, fecha) VALUES
+    (3, 2, 3, 95.00, '2024-01-20'),
+    (3, 3, 5, 90.00, '2024-02-15'),
+    (6, 6, 2, 85.00, '2024-03-10'),
+    (6, 8, 3, 88.00, '2024-04-05'),
+    (8, 2, 1, 80.00, '2024-05-25'),
+    (8, 6, 2, 92.00, '2024-06-20'),
+    (9, 3, 4, 89.00, '2024-07-30'),
+    (9, 8, 5, 94.00, '2024-09-05');
+*/
+-- select * from curso;
+-- select * from nivelescurso
+
+
+
+CALL sp_kardex_filtros(3, '2024-01-01', '2024-12-31', 2, TRUE, 1);
+CALL sp_kardex_filtros(9, '2024-07-01', '2024-09-01', NULL, TRUE, NULL); 
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_kardex_filtros(
+    IN p_id_alumno INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_categoria_id INT,
+    IN p_activo BOOLEAN,
+    IN p_completado INT
+)
+BEGIN
+    SELECT V.id_alumno,
+           V.Nombre_de_curso,
+           V.Curso_status,
+           V.Categoria_ID,
+           V.Categoria,
+           V.Curso_terminado,
+           V.Fecha_de_inscripcion,
+           V.Ultima_fecha,
+           V.Niveles_tomados,
+           V.Niveles_totales
+    FROM vista_Kardex V
+    WHERE (V.id_alumno = p_id_alumno OR p_id_alumno IS NULL)
+      AND (V.Fecha_de_inscripcion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
+      AND (V.Fecha_de_inscripcion <= p_fecha_fin OR p_fecha_fin IS NULL)
+      AND (V.Categoria_ID = p_categoria_id OR p_categoria_id = 0 OR p_categoria_id IS NULL)
+      AND (V.Curso_status = p_activo OR p_activo IS NULL)
+      AND (V.Curso_terminado = p_completado OR p_completado IS NULL)
+    ORDER BY V.Ultima_fecha DESC;
+
+END $$
+
+DELIMITER ;
+
+-- FILTROS VENTA DE CURSOS
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_resumen_curso(
+    IN p_id_usuario INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_categoria_id INT,
+    IN p_activo BOOLEAN
+)
+BEGIN
+    SELECT V.ID_Curso,
+           V.id_maestro,
+           V.Nombre,
+           V.Curso_st,
+           V.Fecha_creacion,
+           V.Categoria_ID,
+           V.Categoria,
+           V.Alumnos_inscritos,
+           V.Ingresos_totales
+    FROM vista_ResumenCurso V
+    WHERE (V.Fecha_creacion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
+      AND (V.Fecha_creacion <= p_fecha_fin OR p_fecha_fin IS NULL)
+      AND (V.Categoria_ID = p_categoria_id OR p_categoria_id = 0 OR p_categoria_id IS NULL)
+      AND (V.Curso_st = p_activo OR p_activo IS NULL)
+      AND (V.id_maestro = p_id_usuario OR p_id_usuario IS NULL)
+    ORDER BY V.Fecha_creacion DESC;
+
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_alumnos_inscritos(
+    IN p_id_usuario INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_categoria_id INT,
+    IN p_activo BOOLEAN
+)
+BEGIN
+    SELECT V.id_alumno,
+           V.Curso,
+           V.Curso_st,
+           V.Alumno,
+           V.Nivel_actual,
+           V.Inscripcion,
+           V.Pago
+    FROM vista_AlumnosInscritos V
+    WHERE (V.id_alumno = p_id_usuario OR p_id_usuario IS NULL)
+      AND (V.Inscripcion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
+      AND (V.Inscripcion <= p_fecha_fin OR p_fecha_fin IS NULL)
+      AND (V.Categoria = (SELECT nombre FROM categoria WHERE id = p_categoria_id) OR p_categoria_id = 0 OR p_categoria_id IS NULL)
+      AND (V.Curso_st = p_activo OR p_activo IS NULL)
+    ORDER BY V.Inscripcion DESC;
+
+END $$
+
+DELIMITER ;
 
 
