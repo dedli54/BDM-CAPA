@@ -68,6 +68,12 @@ CREATE TABLE categoria (
     descripcion TEXT
 );
 
+INSERT INTO `bdm-capa`.`categoria` (`nombre`, `descripcion`)
+VALUES  ('Matematicas','Matematicas'),
+		('Arte','Arte'),
+		('Computo','Computo');
+
+
 CREATE TABLE reporte_categoria (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_admin INT,
@@ -797,13 +803,19 @@ JOIN inscripcion I ON I.id_curso = C.id
 JOIN transaccion T ON t.id_curso = C.id AND T.id_alumno = I.id_alumno
 JOIN kardex K ON K.id_curso = c.id AND K.id_alumno = I.id_alumno;
 
+
+
+-- 			|||||| 	REPORTE DE VENTAS  ||||||
+
+-- drop view if exists vista_ResumenCurso
+-- drop view if exists vista_AlumnosInscritos
 -- vista ventas por curso
 
 CREATE VIEW IF NOT EXISTS vista_ResumenCurso AS
 SELECT  C.id AS ID_Curso,
 		C.id_maestro AS id_maestro,
 		C.titulo AS Nombre,
-    C.status AS Curso_st,
+		C.status AS Curso_st,
 		C.fe_Creacion AS Fecha_creacion,
 		CAT.id AS Categoria_ID,
 		CAT.nombre AS Categoria,
@@ -826,12 +838,22 @@ SELECT I.id_alumno,
     K.lvl_Actual AS Nivel_actual,
     I.fecha_inscripcion AS Inscripcion,
     T.monto AS Pago
+		CAT.id AS Categoria_ID,
+		CAT.nombre AS Categoria,
     -- T.forma_pago AS Forma_de_pago -- Aun no está en la tabla
 FROM curso C
+JOIN categoria CAT ON C.id_categoria = CAT.id
 JOIN inscripcion I ON I.id_curso = C.id
 JOIN usuario U ON U.id = I.id_alumno
 LEFT JOIN kardex K ON K.id_curso = C.id AND K.id_alumno = I.id_alumno
 LEFT JOIN transaccion T ON T.id_curso = C.id AND T.id_alumno = I.id_alumno AND T.estatus = TRUE;
+
+
+
+
+
+
+
 
 
 -- Info para admin de alumnos 
@@ -928,15 +950,15 @@ CREATE PROCEDURE sp_kardex_filtros(
 )
 BEGIN
     SELECT V.id_alumno,
-           V.Nombre_de_curso,
-           V.Curso_status,
+           V.Nombre_de_curso, -- TH Nombre de curso
+           V.Curso_status, -- TH Estatus de curso (activo inactivo)
            V.Categoria_ID,
-           V.Categoria,
-           V.Curso_terminado,
-           V.Fecha_de_inscripcion,
-           V.Ultima_fecha,
-           V.Niveles_tomados,
-           V.Niveles_totales
+           V.Categoria, -- TH categoria
+           V.Curso_terminado, -- TH Diploma  
+           V.Fecha_de_inscripcion, -- TH fecha de inscripcion
+           V.Ultima_fecha, -- TH ultima fecha
+           V.Niveles_tomados, -- TH Niveles tomados 
+           V.Niveles_totales -- TH Niveles totales
     FROM vista_Kardex V
     WHERE (V.id_alumno = p_id_alumno OR p_id_alumno IS NULL)
       AND (V.Fecha_de_inscripcion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
@@ -954,6 +976,7 @@ DELIMITER ;
 
 DELIMITER $$
 
+
 CREATE PROCEDURE sp_resumen_curso(
     IN p_id_usuario INT,
     IN p_fecha_inicio DATE,
@@ -962,15 +985,15 @@ CREATE PROCEDURE sp_resumen_curso(
     IN p_activo BOOLEAN
 )
 BEGIN
-    SELECT V.ID_Curso,
-           V.id_maestro,
-           V.Nombre,
+    SELECT V.ID_Curso, -- Num
+           V.id_maestro, -- 
+           V.Nombre, -- Nombre
            V.Curso_st,
-           V.Fecha_creacion,
+           V.Fecha_creacion, -- Fecha creacion
            V.Categoria_ID,
-           V.Categoria,
-           V.Alumnos_inscritos,
-           V.Ingresos_totales
+           V.Categoria, -- Categoria
+           V.Alumnos_inscritos, -- Alumnos Inscritos 
+           V.Ingresos_totales -- Ingresos totales
     FROM vista_ResumenCurso V
     WHERE (V.Fecha_creacion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
       AND (V.Fecha_creacion <= p_fecha_fin OR p_fecha_fin IS NULL)
@@ -983,8 +1006,9 @@ END $$
 
 DELIMITER ;
 
-DELIMITER $$
-
+DELIMITER $$ 
+-- DROP PROCEDURE IF EXISTS sp_alumnos_inscritos
+-- call sp_alumnos_inscritos(1,null,null,null,null)
 CREATE PROCEDURE sp_alumnos_inscritos(
     IN p_id_usuario INT,
     IN p_fecha_inicio DATE,
@@ -994,17 +1018,17 @@ CREATE PROCEDURE sp_alumnos_inscritos(
 )
 BEGIN
     SELECT V.id_alumno,
-           V.Curso,
-           V.Curso_st,
-           V.Alumno,
+           V.Curso, -- Nombre del curso
+           V.Curso_st, 
+           V.Alumno, -- Alumno
            V.Nivel_actual,
-           V.Inscripcion,
-           V.Pago
+           V.Inscripcion, -- fecha
+           V.Pago -- pago + FaltaForma de pago default tarjeta
     FROM vista_AlumnosInscritos V
     WHERE (V.id_alumno = p_id_usuario OR p_id_usuario IS NULL)
       AND (V.Inscripcion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
       AND (V.Inscripcion <= p_fecha_fin OR p_fecha_fin IS NULL)
-      AND (V.Categoria = (SELECT nombre FROM categoria WHERE id = p_categoria_id) OR p_categoria_id = 0 OR p_categoria_id IS NULL)
+      AND (V.Categoria_ID = p_categoria_id OR p_categoria_id = 0 OR p_categoria_id IS NULL)
       AND (V.Curso_st = p_activo OR p_activo IS NULL)
     ORDER BY V.Inscripcion DESC;
 
@@ -1012,4 +1036,27 @@ END $$
 
 DELIMITER ;
 
+-- select * from categoria
 
+/*
+INSERT INTO `bdm-capa`.`categoria` (`nombre`, `descripcion`)
+VALUES ('Matematicas','Matematicas'),('Arte','Arte'), ('Computo','Computo');
+*/
+-- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||| Mostrar las categorias en los select: ||||||||||||||||||||||||||||||||||||
+-- DROP PROCEDURE if exists sp_Categorias
+DELIMITER $$ 
+
+CREATE PROCEDURE sp_Categorias(
+    IN p_categoria_id INT
+)
+BEGIN
+
+    IF p_categoria_id IS NULL OR p_categoria_id = 0 THEN
+        SELECT id, nombre FROM categoria;
+    ELSE
+        SELECT id, nombre, descripcion FROM categoria WHERE id = p_categoria_id; -- Una en especifico (por si se ocupa idk)
+    END IF;
+END $$
+
+DELIMITER ;
+-- call sp_Categorias (0)

@@ -1,3 +1,42 @@
+<?php 
+include '../conexion.php';
+          $conexion = new conexion();
+          $pdo = $conexion->conectar();
+
+/* 
+session_start(); // Inicia la sesión
+
+if (!isset($_SESSION['user_id'])) {
+    // Muestra un alert antes de redirigir
+    echo "<script>
+            alert('La sesión no está iniciada. Por favor, inicia sesión.');
+            window.location.href = 'inicioSesion.php';
+          </script>";
+    exit();
+}*/
+
+if ($pdo) {
+
+  $p_categoria_id = 0; 
+
+  $stmt = $pdo->prepare("CALL sp_Categorias(?)");
+  $stmt->bindParam(1, $p_categoria_id, PDO::PARAM_INT);
+
+  $stmt->execute();
+
+  $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  // Cerrar la conexión
+  $stmt->closeCursor();
+  $pdo = null;
+} else {
+  echo "Error de conexión.";
+}
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -136,9 +175,18 @@
                             <label for="cCategoria" class="form-label fs-5 subtitulos">Categoria:</label>
                                 <select class="form-select rounded-5" id="cCategoria">
                                     <option selected>Categoria</option>
-                                    <option value="1">Matematicas</option>
-                                    <option value="2">Arte</option>
-                                    <option value="3">Computo</option>
+                                    
+                                    <?php
+                                        foreach ($categorias as $categoria) {
+                                            echo '<option value="' . $categoria['id'] . '"'; // ID en el valor
+
+                                            if (isset($_POST['categoria_id']) && $_POST['categoria_id'] == $categoria['id']) { //Esto es para que se mantenga al llamar al formulario de los filtros
+                                                echo ' selected';
+                                            }
+                                            echo '>' . $categoria['nombre'] . '</option>'; // Nombre de la categoria se muestra 
+                                        }
+                                        ?>
+
                                 </select>
                         </div>
                         <div class="mb-3 costo">
