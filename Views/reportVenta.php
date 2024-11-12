@@ -200,7 +200,7 @@ $pdo = null;
 
 
 <!-- Barra de Filtros -->
-<form id="filtrosRPVenta">
+<form id="filtrosRPVenta" method="POST">
   <div class="container my-3">
       <div class="row">
         <div class="col-auto ms-auto">
@@ -310,8 +310,8 @@ $pdo = null;
                 <?php foreach ($resultados_alumnos as $alumno): ?>
                     <tr>
                         <td><?= htmlspecialchars($alumno['Curso']) ?></td> <!-- Id del curso -->
-                        <td><?= htmlspecialchars($alumno['Curso']) ?></td>
                         <td><?= htmlspecialchars($alumno['Alumno']) ?></td>
+                        <td><?= htmlspecialchars($alumno['Nivel_actual']) ?></td>
                         <td><?= htmlspecialchars($alumno['Inscripcion']) ?></td>
                         <td><?= htmlspecialchars($alumno['Pago']) ?></td>
                         <td><?= htmlspecialchars($alumno['Pago']) ?></td>

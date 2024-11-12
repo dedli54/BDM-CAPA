@@ -595,7 +595,7 @@ DELIMITER ;
 
 
 -- Así se usa: CALL sp_login('admin@example.com', 'password123');
-select * from usuario
+-- select * from usuario
 
 -- SP 
 DELIMITER //
@@ -810,11 +810,18 @@ JOIN kardex K ON K.id_curso = c.id AND K.id_alumno = I.id_alumno;
 -- drop view if exists vista_ResumenCurso
 -- drop view if exists vista_AlumnosInscritos
 -- vista ventas por curso
+select * from curso
+select * from inscripcion where id_curso = 1;
+
+UPDATE curso 
+SET status = 0
+WHERE id = 3;
+
 
 CREATE VIEW IF NOT EXISTS vista_ResumenCurso AS
 SELECT  C.id AS ID_Curso,
 		C.id_maestro AS id_maestro,
-		C.titulo AS Nombre,
+		C.titulo AS Nombre, -- Nombre del curso
 		C.status AS Curso_st,
 		C.fe_Creacion AS Fecha_creacion,
 		CAT.id AS Categoria_ID,
@@ -833,13 +840,14 @@ GROUP BY C.id;
 CREATE VIEW IF NOT EXISTS vista_AlumnosInscritos AS
 SELECT I.id_alumno,
     C.titulo AS Curso,
+    C.id_maestro AS Maestro_ID,
     C.status AS Curso_st,
     U.nombre AS Alumno,
     K.lvl_Actual AS Nivel_actual,
     I.fecha_inscripcion AS Inscripcion,
-    T.monto AS Pago
+    T.monto AS Pago,
 		CAT.id AS Categoria_ID,
-		CAT.nombre AS Categoria,
+		CAT.nombre AS Categoria
     -- T.forma_pago AS Forma_de_pago -- Aun no está en la tabla
 FROM curso C
 JOIN categoria CAT ON C.id_categoria = CAT.id
@@ -856,39 +864,7 @@ LEFT JOIN transaccion T ON T.id_curso = C.id AND T.id_alumno = I.id_alumno AND T
 
 
 
--- Info para admin de alumnos 
-CREATE VIEW IF NOT EXISTS vista_AlumnoRpt AS
-SELECT U.id AS ID,
-    CONCAT(U.nombre, ' ', U.apellidos) AS Nombre,
-    U.fecha_creacion AS Fecha_ingreso,
-    COUNT(I.id_curso) AS Cursos_inscritos,
-    ROUND((SUM(
-			CASE 
-				WHEN K.lvl_Actual = C.niveles THEN 1
-				ELSE 0
-			END) / COUNT(I.id_curso)) * 100, 2
-    ) AS Porcentaje_terminados
-FROM usuario U
-LEFT JOIN inscripcion I ON I.id_alumno = U.id
-LEFT JOIN curso C ON C.id = I.id_curso
-LEFT JOIN kardex K ON K.id_alumno = U.id AND K.id_curso = C.id
-WHERE  U.tipo_usuario = 1  -- Alumno 
-GROUP BY  U.id; 
 
--- ------------------ select * from usuario
-
-CREATE VIEW IF NOT EXISTS vista_InstructorRpt AS
-SELECT 
-    U.id AS ID,
-    CONCAT(U.nombre, ' ', U.apellidos) AS Nombre,
-    U.fecha_creacion AS Fecha_ingreso,
-    COUNT(DISTINCT C.id) AS Cursos_totales,
-    IFNULL(SUM(T.monto), 0) AS Ganancias
-FROM usuario U
-LEFT JOIN curso C ON C.id_maestro = U.id
-LEFT JOIN transaccion T ON T.id_curso = C.id AND T.estatus = TRUE
-WHERE U.tipo_usuario = 2  -- Instructor
-GROUP BY U.id; 
     
 --
 -- PROCEDURES PARA LAS VENTANAS HTML
@@ -975,9 +951,8 @@ DELIMITER ;
 -- FILTROS VENTA DE CURSOS
 
 DELIMITER $$
-
-
-CREATE PROCEDURE sp_resumen_curso(
+-- TABLA CURSOS
+CREATE PROCEDURE sp_resumen_curso( -- Muestra los cursos del profesor
     IN p_id_usuario INT,
     IN p_fecha_inicio DATE,
     IN p_fecha_fin DATE,
@@ -999,16 +974,18 @@ BEGIN
       AND (V.Fecha_creacion <= p_fecha_fin OR p_fecha_fin IS NULL)
       AND (V.Categoria_ID = p_categoria_id OR p_categoria_id = 0 OR p_categoria_id IS NULL)
       AND (V.Curso_st = p_activo OR p_activo IS NULL)
-      AND (V.id_maestro = p_id_usuario OR p_id_usuario IS NULL)
-    ORDER BY V.Fecha_creacion DESC;
+      AND (V.id_maestro = p_id_usuario OR p_id_usuario IS NULL OR p_id_usuario = 0)
+    ORDER BY V.ID_Curso;
 
 END $$
 
 DELIMITER ;
 
 DELIMITER $$ 
+-- DROP PROCEDURE IF EXISTS sp_resumen_curso
 -- DROP PROCEDURE IF EXISTS sp_alumnos_inscritos
--- call sp_alumnos_inscritos(1,null,null,null,null)
+-- call sp_resumen_curso(0,null,null,null,null)
+-- call sp_alumnos_inscritos(2,null,null,null,null)
 CREATE PROCEDURE sp_alumnos_inscritos(
     IN p_id_usuario INT,
     IN p_fecha_inicio DATE,
@@ -1025,12 +1002,12 @@ BEGIN
            V.Inscripcion, -- fecha
            V.Pago -- pago + FaltaForma de pago default tarjeta
     FROM vista_AlumnosInscritos V
-    WHERE (V.id_alumno = p_id_usuario OR p_id_usuario IS NULL)
+    WHERE (V.Maestro_ID = p_id_usuario OR p_id_usuario IS NULL OR p_id_usuario = 0)
       AND (V.Inscripcion >= p_fecha_inicio OR p_fecha_inicio IS NULL)
       AND (V.Inscripcion <= p_fecha_fin OR p_fecha_fin IS NULL)
       AND (V.Categoria_ID = p_categoria_id OR p_categoria_id = 0 OR p_categoria_id IS NULL)
       AND (V.Curso_st = p_activo OR p_activo IS NULL)
-    ORDER BY V.Inscripcion DESC;
+    ORDER BY V.Curso;
 
 END $$
 
@@ -1046,6 +1023,7 @@ VALUES ('Matematicas','Matematicas'),('Arte','Arte'), ('Computo','Computo');
 -- DROP PROCEDURE if exists sp_Categorias
 DELIMITER $$ 
 
+-- Mostrar todas las categorias en los SELECT
 CREATE PROCEDURE sp_Categorias(
     IN p_categoria_id INT
 )
@@ -1060,3 +1038,101 @@ END $$
 
 DELIMITER ;
 -- call sp_Categorias (0)
+
+
+-- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||| Reportes para admin ||||||||||||||||||||||||||||||||||||
+
+-- USE `bdm-capa`;
+-- select * from inscripcion
+
+-- Info para admin de alumnos 
+
+/*
+DROP VIEW IF EXISTS vista_AlumnoRpt;
+DROP VIEW IF EXISTS vista_InstructorRpt;
+*/
+CREATE VIEW IF NOT EXISTS vista_AlumnoRpt AS
+SELECT U.id AS ID,
+	U.intentos_fallidos AS intentos,
+    U.estado, -- Activo inactivo
+    CONCAT(U.nombre, ' ', U.apellidos) AS Nombre,
+    U.fecha_creacion AS Fecha_ingreso,
+    -- K.lvl_Actual,
+    -- C.niveles,
+    COUNT(I.id_curso) AS Cursos_inscritos,
+    ROUND((SUM(
+			CASE 
+				WHEN K.lvl_Actual >= C.niveles THEN 1
+				ELSE 0
+			END) / COUNT(I.id_curso)) * 100, 2
+    ) AS Porcentaje_terminados
+FROM usuario U
+LEFT JOIN inscripcion I ON I.id_alumno = U.id
+LEFT JOIN curso C ON C.id = I.id_curso
+LEFT JOIN kardex K ON K.id_alumno = U.id AND K.id_curso = C.id
+WHERE  U.tipo_usuario = 1  -- Alumno 
+GROUP BY  U.id; 
+
+-- ------------------ select * from usuario
+
+CREATE VIEW IF NOT EXISTS vista_InstructorRpt AS
+SELECT 
+    U.id AS ID,
+	U.intentos_fallidos AS intentos,
+    U.estado,
+    CONCAT(U.nombre, ' ', U.apellidos) AS Nombre,
+    U.fecha_creacion AS Fecha_ingreso,
+    COUNT(DISTINCT C.id) AS Cursos_totales,
+    IFNULL(SUM(T.monto), 0) AS Ganancias
+FROM usuario U
+LEFT JOIN curso C ON C.id_maestro = U.id
+LEFT JOIN transaccion T ON T.id_curso = C.id AND T.estatus = TRUE
+WHERE U.tipo_usuario = 2  -- Instructor
+GROUP BY U.id; 
+
+
+
+DELIMITER $$ 
+
+-- DROP PROCEDURE IF EXISTS sp_reporteUser
+
+CREATE PROCEDURE sp_reporteUser(
+    IN p_Vista INT
+)
+BEGIN
+    IF p_Vista = 1 THEN
+    
+        SELECT V.ID,
+			V.intentos,
+            V.estado,
+            V.Nombre,
+            V.Fecha_ingreso,
+            V.Cursos_inscritos,
+            V.Porcentaje_terminados
+        FROM vista_AlumnoRpt V  -- SELECT *  FROM vista_AlumnoRpt V 
+        WHERE V.estado = 1
+        ORDER BY V.ID;
+        
+    ELSEIF p_Vista = 2 THEN
+    
+        SELECT  V.ID,
+				V.intentos,
+				V.estado,
+				V.Nombre,
+				V.Fecha_ingreso,
+				V.Cursos_totales,
+				V.Ganancias
+        FROM vista_InstructorRpt V
+        WHERE V.estado = 1
+        ORDER BY V.ID;
+        
+    ELSE
+        SELECT 'Error en procedure' AS error;
+    END IF;
+END $$
+
+DELIMITER ;
+
+-- select * from kardex
+
+call sp_reporteUser (2)

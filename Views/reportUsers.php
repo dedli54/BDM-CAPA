@@ -1,3 +1,24 @@
+<?php 
+include '../conexion.php';
+          $conexion = new conexion();
+          $pdo = $conexion->conectar();
+
+/* 
+session_start(); // Inicia la sesión
+
+if (!isset($_SESSION['user_id'])) {
+    // Muestra un alert antes de redirigir
+    echo "<script>
+            alert('La sesión no está iniciada. Por favor, inicia sesión.');
+            window.location.href = 'inicioSesion.php';
+          </script>";
+    exit();
+}*/
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -103,16 +124,56 @@
                       <th scope="col">Fecha ingreso</th>
                       <th scope="col">Cursos inscritos</th>
                       <th scope="col">% de terminados</th>
+                      <th scope="col">Cuenta bloqueada (3 intentos)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                        <th>2</th>
-                        <th>Jose Aureliano</th>
-                        <th>02/01/01</th>
-                        <th>4</th>
-                        <th>25%</th>
-                    </tr>
+                    
+                  <?php
+                    
+                    $pdo = $conexion->conectar();
+                    
+
+                    try {
+                      
+                        $p_Vista = 1; // ID asignar con el $_SESSION['user_id']
+
+                        $stmt = $pdo->prepare("CALL sp_reporteUser(?)");
+                        $stmt->execute([$p_Vista]);
+
+                        if ($stmt->rowCount() > 0) {
+                            $num = 1;
+                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                echo "<tr>";
+                                // echo "<td>" . $num++ . "</td>";
+                                echo "<td>" . htmlspecialchars($row['ID']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Nombre']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Fecha_ingreso']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Cursos_inscritos']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Porcentaje_terminados']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['intentos']) . "</td>";
+                                /*if ($row['Curso_terminado']) {
+                                    echo "<td><a href='diploma.php?id=" . $row['id_alumno'] . "' target='_blank'>Ver Diploma</a></td>";
+                                } else {
+                                    echo "<td>No disponible</td>";
+                                }*/
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='9'>No hay registros que coincidan con los filtros aplicados</td></tr>";
+                        }
+
+                        $stmt->closeCursor();  // Cerrar el cursor
+                        $pdo = null;
+
+                    } catch (PDOException $e) {
+                        echo "<tr><td colspan='9'>Error: " . $e->getMessage() . "</td></tr>";
+                    }
+
+
+
+
+                  ?>
   
                   </tbody>
                 </table>
@@ -130,16 +191,56 @@
                     <th scope="col">Fecha ingreso</th>
                     <th scope="col">Cursos totales</th>
                     <th scope="col">Ganancias</th>
+                    <th scope="col">Cuenta bloqueada (3 intentos)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                      <th>1</th>
-                      <th>Jose Pino</th>
-                      <th>01/01/01</th>
-                      <th>66</th>
-                      <th>$15000.00</th>
-                  </tr>
+                  
+                <?php
+                    
+                    $pdo = $conexion->conectar();
+                    
+
+                    try {
+                      
+                        $p_Vista = 2; // ID asignar con el $_SESSION['user_id']
+
+                        $stmt = $pdo->prepare("CALL sp_reporteUser(?)");
+                        $stmt->execute([$p_Vista]);
+
+                        if ($stmt->rowCount() > 0) {
+                            $num = 1;
+                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                echo "<tr>";
+                                // echo "<td>" . $num++ . "</td>";
+                                echo "<td>" . htmlspecialchars($row['ID']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Nombre']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Fecha_ingreso']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Cursos_totales']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['Ganancias']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['intentos']) . "</td>";
+                                /*if ($row['Curso_terminado']) {
+                                    echo "<td><a href='diploma.php?id=" . $row['id_alumno'] . "' target='_blank'>Ver Diploma</a></td>";
+                                } else {
+                                    echo "<td>No disponible</td>";
+                                }*/
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='9'>No hay registros que coincidan con los filtros aplicados</td></tr>";
+                        }
+
+                        $stmt->closeCursor();  // Cerrar el cursor
+                        $pdo = null;
+
+                    } catch (PDOException $e) {
+                        echo "<tr><td colspan='9'>Error: " . $e->getMessage() . "</td></tr>";
+                    }
+
+
+
+
+                  ?>
 
                 </tbody>
             </table>
