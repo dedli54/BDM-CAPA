@@ -1,12 +1,18 @@
 /* Copia manual de la DB */
 
+
+
+/*
+-- en workbench puedes crear una nueva BD o borrar la anterior,
+-- Seleccionas todo con ctrl + A 
+-- Le das correr y tendras 31 notificaciones de creacion (si limpiaste el action output)
+
+OJO debes de poner el nombre CORRECTO de la BD en las VIEWS
+
 CREATE DATABASE `bdm-capa3`;
 
 USE `bdm-capa3`;
-
-/*
-
-
+DROP DATABASE `bdm-capa3`
 
 -- curso - cat - user
 
