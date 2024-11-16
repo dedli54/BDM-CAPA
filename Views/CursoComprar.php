@@ -141,11 +141,15 @@ try {
                     </div>
                     <div class="col-11 col-md-8"> 
 
-                        <h2 class="titulos">Introduccion a SQL</h2>
-                        <h6 class="subtitulos-categoria">Categoria: Programacion</h6>
-                        <p class=" fs-5 textos">
-                            En este curso aprenderas sobre SQL (Structured Query Language) es un lenguaje estándar utilizado para gestionar y manipular bases de datos relacionales. Permite realizar diversas operaciones como consultar, actualizar, insertar o eliminar datos dentro de una base de datos.    
-                        </p>
+                        <h2 class="titulos"><?= htmlspecialchars($curso['titulo']) ?></h2>
+                        <h6 class="subtitulos-categoria">Categoria: <?= htmlspecialchars($curso['categoria']) ?></h6>
+                        <p class="fs-5 textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
+                        <p class="fs-5 textos">Instructor: <?= htmlspecialchars($curso['autor']) ?></p>
+                        <div class="d-flex justify-content-end btnDiv">
+                            <button class="btn btn-lg btn-dark" id="buyCurso">
+                                Comprar curso ($<?= number_format($curso['precio'], 2) ?>)
+                            </button>
+                        </div>
 
 
                     </div>
