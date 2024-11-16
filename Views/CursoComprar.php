@@ -12,7 +12,7 @@ try {
     $pdo = $conexion->conectar();
     
     //  Query para ver la visat 
-    $stmt = $pdo->prepare("SELECT * FROM vista _curso_detalle WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM vista_curso_detalle WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $curso = $stmt->fetch(PDO::FETCH_ASSOC);
     
