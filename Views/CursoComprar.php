@@ -8,19 +8,11 @@ if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
 }
 
 try {
-    $conexion = new conexion();
+    $conexion = new conexion(); 
     $pdo = $conexion->conectar();
     
-    // detalles de curso
-    $stmt = $pdo->prepare("
-        SELECT c.*, cat.nombre as categoria, 
-        CONCAT(u.nombre, ' ', u.apellidos) as autor 
-        FROM curso c
-        JOIN categoria cat ON c.id_categoria = cat.id
-        JOIN usuario u ON c.id_maestro = u.id 
-        WHERE c.id = ? AND c.status = 1
-    ");
-    
+    //  Query para ver la visat 
+    $stmt = $pdo->prepare("SELECT * FROM vista _curso_detalle WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $curso = $stmt->fetch(PDO::FETCH_ASSOC);
     

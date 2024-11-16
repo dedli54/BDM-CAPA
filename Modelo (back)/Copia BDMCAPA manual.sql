@@ -551,3 +551,19 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+CREATE VIEW vista_curso_detalle AS
+SELECT 
+    c.*,
+    cat.nombre as categoria,
+    CONCAT(u.nombre, ' ', u.apellidos) as autor,
+    COUNT(DISTINCT i.id_alumno) as total_inscritos,
+    AVG(CASE WHEN com.id IS NOT NULL THEN 1 ELSE 0 END) as promedio_calificacion
+FROM curso c
+JOIN categoria cat ON c.id_categoria = cat.id 
+JOIN usuario u ON c.id_maestro = u.id
+LEFT JOIN inscripcion i ON i.id_curso = c.id
+LEFT JOIN comentario com ON com.id_curso = c.id
+WHERE c.status = 1
+GROUP BY c.id;
