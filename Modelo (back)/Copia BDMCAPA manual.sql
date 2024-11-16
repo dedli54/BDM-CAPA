@@ -499,3 +499,55 @@ INSERT INTO `bdm-capa`.`categoria` (`nombre`, `descripcion`)
 VALUES  ('Matematicas','Matematicas'),
 		('Arte','Arte'),
 		('Computo','Computo');
+
+
+        DELIMITER $$
+
+CREATE PROCEDURE sp_obtener_cursos(
+    IN p_categoria_id INT,
+    IN p_tipo VARCHAR(20) -- 'recientes', 'vendidos', 'calificados'
+)
+BEGIN
+    CASE p_tipo
+        WHEN 'recientes' THEN
+            -- conseguir los mas recientes
+            SELECT 
+                c.id,
+                c.titulo,
+                c.descripcion,
+                c.precio,
+                c.foto,
+                cat.nombre as categoria,
+                CONCAT(u.nombre, ' ', u.apellidos) as autor
+            FROM curso c
+            JOIN categoria cat ON c.id_categoria = cat.id 
+            JOIN usuario u ON c.id_maestro = u.id
+            WHERE (c.id_categoria = p_categoria_id OR p_categoria_id = 0)
+            AND c.status = 1
+            ORDER BY c.fe_Creacion DESC
+            LIMIT 6;
+            
+        WHEN 'vendidos' THEN
+            -- conseguir los cursos mas vendidos 
+            SELECT 
+                c.id,
+                c.titulo,
+                c.descripcion,
+                c.precio,
+                c.foto,
+                cat.nombre as categoria,
+                CONCAT(u.nombre, ' ', u.apellidos) as autor,
+                COUNT(i.id_curso) as total_ventas
+            FROM curso c
+            JOIN categoria cat ON c.id_categoria = cat.id
+            JOIN usuario u ON c.id_maestro = u.id
+            LEFT JOIN inscripcion i ON c.id = i.id_curso
+            WHERE (c.id_categoria = p_categoria_id OR p_categoria_id = 0)
+            AND c.status = 1
+            GROUP BY c.id
+            ORDER BY total_ventas DESC
+            LIMIT 6;
+    END CASE;
+END$$
+
+DELIMITER ;

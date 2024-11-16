@@ -10,6 +10,33 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+require '../conexion.php';
+
+// Test connection
+try {
+    $conexion = new conexion();
+    $pdo = $conexion->conectar();
+    
+    if (!$pdo) {
+        throw new Exception('Could not connect to database');
+    }
+} catch (Exception $e) {
+    die("Connection error: " . $e->getMessage());
+}
+
+// Get recent courses
+$stmt = $pdo->prepare("CALL sp_obtener_cursos(0, 'recientes')");
+$stmt->execute();
+$cursos_recientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
+// Get top selling courses  
+$stmt = $pdo->prepare("CALL sp_obtener_cursos(0, 'vendidos')");
+$stmt->execute();
+$cursos_vendidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
+$pdo = null;
 ?>
 
 
@@ -36,7 +63,7 @@ if (!isset($_SESSION['user_id'])) {
 <body class="d-flex flex-column min-vh-100">
 
 
-        
+
     <div class="container conLogo">
         <h1 class="titulos">A&B Cursos</h1>
         </div>
@@ -110,68 +137,34 @@ if (!isset($_SESSION['user_id'])) {
           
           
           <!--                                                                       Cajita con cursos-->
-        <div class="container cont-Cursos px-2 ">
-        <div class="row rowCursos gx-5" >
-    
-    
-            <!--Aqui agregar cada curso-->
-    
-            <div class="card col-lg col-md-5 col-sm-11 px-0" >
-                <div class="row no-gutters">
-                    <div class="col-5">
-                        <div class="card-body">
-                            <h4 class="card-title subtitulos">SQL Basico</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Introduccion a la materia SQL donde...</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="CursoComprar.html" class="btn btn-primary btn-sm">Leer más</a>
-                        </div>
-                    </div>
-                    <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                    </div>
-                </div>
-            </div>  
-    
+        <div class="container cont-Cursos px-2">
+    <div class="row rowCursos gx-5">
+        <?php foreach ($cursos_recientes as $curso): ?>
             <div class="card col-lg col-md-5 col-sm-11 px-0">
                 <div class="row no-gutters">
                     <div class="col-5">
                         <div class="card-body">
-                            <h4 class="card-title subtitulos">Bootstrap</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Info de lo que se trata el curso</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
+                            <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['titulo']) ?></h4>
+                            <p class="subtitulos-categoria small"><?= htmlspecialchars($curso['autor']) ?> | <?= htmlspecialchars($curso['categoria']) ?></p>
+                            <p class="textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
+                            <p class="textos">Costo $<?= number_format($curso['precio'], 2) ?></p>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <a href="CursoComprar.php?id=<?= $curso['id'] ?>" class="btn btn-primary btn-sm">Leer más</a>
+                            <?php else: ?>
+                                <a href="inicioSesion.php" class="btn btn-primary btn-sm">Iniciar sesión para ver</a>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/boots.jpg" alt="Imagen del curso">
+                        <img class="img-fluid h-100 imgCard" 
+                             src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
+                             alt="Imagen del curso">
                     </div>
                 </div>
-            </div>  
-    
-            <div class="card col-lg col-md-5 col-sm-11 px-0">
-                <div class="row no-gutters">
-                    <div class="col-5">
-                        <div class="card-body">
-                            <h4 class="card-title subtitulos">Nombre curso</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Info de lo que se trata el curso</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                        </div>
-                    </div>
-                    <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                    </div>
-                </div>
-            </div>          
-    
-        </div>
-    
-            
-    
-        </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
 
         
         <div class="container"><hr>
@@ -181,68 +174,13 @@ if (!isset($_SESSION['user_id'])) {
 
 
                   <!--                                                                Cajita con cursos-->
-                  <div class="container cont-Cursos px-2 ">
-                    <div class="row rowCursos gx-5" >
-                
-                
-                        <!--Aqui agregar cada curso-->
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0" >
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso...</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="CursoComprar.html" class="btn btn-primary btn-sm">Leer más</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>          
-                
+                  <div class="container cont-Cursos px-2">
+                    <div class="row rowCursos gx-5">
+                        <?php foreach ($cursos_vendidos as $curso): ?>
+                            <!-- Same card structure as above -->
+                        <?php endforeach; ?>
                     </div>
-                
-                        
-                
-                    </div>
+                </div>
 
         <div class="container"><hr>
             <h2 class="titulos">Mejor calificados</h2>
