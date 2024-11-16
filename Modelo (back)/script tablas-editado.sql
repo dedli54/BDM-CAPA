@@ -557,40 +557,56 @@ DELIMITER ;
 
 -- PROCEDURE PARA EL LOGIN con lo de 3 intentos actualizado
 
-DELIMITER //
-
-CREATE PROCEDURE sp_login(
+DELIMITER $$
+CREATE PROCEDURE `sp_login`( 
     IN p_email VARCHAR(100),
     IN p_contrasena VARCHAR(255)
 )
 BEGIN
     DECLARE v_id INT;
     DECLARE v_tipo_usuario TINYINT;
-    DECLARE v_estado INT;
+    DECLARE v_estado TINYINT;
+    DECLARE v_intentos INT;
 
-    -- Call sp_consultar_usuario to verify user status and password
-    CALL sp_consultar_usuario(p_email, p_contrasena, v_estado);
+    -- agarra la info del user
+    SELECT id, tipo_usuario, estado, intentos_fallidos 
+    INTO v_id, v_tipo_usuario, v_estado, v_intentos
+    FROM usuario 
+    WHERE email = p_email;
 
-    -- Check the result of sp_consultar_usuario
-    IF v_estado = 1 THEN
-        -- If successful (v_estado = 1), proceed with the main login logic
-        SELECT id, tipo_usuario INTO v_id, v_tipo_usuario
-        FROM usuario
-        WHERE email = p_email AND contrasena = p_contrasena;
+    -- checa si existe
+    IF v_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email o contraseña incorrectos';
+    END IF;
 
-        -- If user is found, return the id and user type
-        IF v_id IS NOT NULL THEN
-            SELECT v_id AS id, v_tipo_usuario AS tipo_usuario;
-        ELSE
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email o contraseña incorrectos';
-        END IF;
-    ELSEIF v_estado = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Contraseña incorrecta';
-    ELSEIF v_estado = -1 THEN
+    -- checa si esta bloqueada
+    IF v_estado = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cuenta bloqueada';
     END IF;
-END //
 
+    -- valida contra
+    IF p_contrasena = (SELECT contrasena FROM usuario WHERE id = v_id) THEN
+        -- contra correcta restablece intentos
+        UPDATE usuario 
+        SET intentos_fallidos = 0 
+        WHERE id = v_id;
+        
+        -- regresa user info
+        SELECT v_id AS id, v_tipo_usuario AS tipo_usuario;
+    ELSE
+        -- aumenta los intentos fallidos
+        SET v_intentos = v_intentos + 1;
+        
+        UPDATE usuario 
+        SET intentos_fallidos = v_intentos,
+            estado = IF(v_intentos >= 3, 0, 1)
+        WHERE id = v_id;
+
+        -- errore de mensaje :P
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email o contraseña incorrectos';
+    END IF;
+
+END$$
 DELIMITER ;
 
 
