@@ -11,7 +11,7 @@ try {
     $conexion = new conexion();
     $pdo = $conexion->conectar();
     
-    // Get course details
+    // detalles de curso
     $stmt = $pdo->prepare("
         SELECT c.*, cat.nombre as categoria, 
         CONCAT(u.nombre, ' ', u.apellidos) as autor 
@@ -43,7 +43,7 @@ try {
 
 <title>Curso</title>
 <!--script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6oIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"-->
 <link rel="stylesheet" href="CSS/bootstrapCSS/bootstrap.min.css">
 <link rel="stylesheet" href="CSS/colores.css">
 <link rel="stylesheet" href="CSS/perfil.css">
@@ -141,15 +141,11 @@ try {
                     </div>
                     <div class="col-11 col-md-8"> 
 
-                        <h2 class="titulos"><?= htmlspecialchars($curso['titulo']) ?></h2>
-                        <h6 class="subtitulos-categoria">Categoria: <?= htmlspecialchars($curso['categoria']) ?></h6>
-                        <p class="fs-5 textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
-                        <p class="fs-5 textos">Instructor: <?= htmlspecialchars($curso['autor']) ?></p>
-                        <div class="d-flex justify-content-end btnDiv">
-                            <button class="btn btn-lg btn-dark" id="buyCurso">
-                                Comprar curso ($<?= number_format($curso['precio'], 2) ?>)
-                            </button>
-                        </div>
+                        <h2 class="titulos">Introduccion a SQL</h2>
+                        <h6 class="subtitulos-categoria">Categoria: Programacion</h6>
+                        <p class=" fs-5 textos">
+                            En este curso aprenderas sobre SQL (Structured Query Language) es un lenguaje estándar utilizado para gestionar y manipular bases de datos relacionales. Permite realizar diversas operaciones como consultar, actualizar, insertar o eliminar datos dentro de una base de datos.    
+                        </p>
 
 
                     </div>

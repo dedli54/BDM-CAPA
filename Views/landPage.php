@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 
 require '../conexion.php';
 
-// Test connection
+// test de conexcion 
 try {
     $conexion = new conexion();
     $pdo = $conexion->conectar();
@@ -24,13 +24,13 @@ try {
     die("Connection error: " . $e->getMessage());
 }
 
-// Get recent courses
+// agarrar los cursos recientes
 $stmt = $pdo->prepare("CALL sp_obtener_cursos(0, 'recientes')");
 $stmt->execute();
 $cursos_recientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
 
-// Get top selling courses  
+// los mas vendidos  
 $stmt = $pdo->prepare("CALL sp_obtener_cursos(0, 'vendidos')");
 $stmt->execute();
 $cursos_vendidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
