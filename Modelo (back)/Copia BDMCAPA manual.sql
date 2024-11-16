@@ -50,14 +50,14 @@ CREATE TABLE `usuario` (
   UNIQUE KEY `email` (`email`),
   KEY `tipo_usuario` (`tipo_usuario`),
   CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`tipo_usuario`) REFERENCES `tipo_usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `categoria` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   `descripcion` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `reporte_categoria` ( -- JJ: aún no la uso
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -90,7 +90,7 @@ CREATE TABLE `curso` (
   KEY `id_categoria` (`id_categoria`),
   CONSTRAINT `curso_ibfk_1` FOREIGN KEY (`id_maestro`) REFERENCES `usuario` (`id`),
   CONSTRAINT `curso_ibfk_2` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `nivelescurso` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -101,7 +101,7 @@ CREATE TABLE `nivelescurso` (
   PRIMARY KEY (`id`),
   KEY `id_curso` (`id_curso`),
   CONSTRAINT `nivelescurso_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `curso` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `comentario` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -114,7 +114,7 @@ CREATE TABLE `comentario` (
   KEY `id_curso` (`id_curso`),
   CONSTRAINT `comentario_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `usuario` (`id`),
   CONSTRAINT `comentario_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `curso` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inscripcion` (
   `id_alumno` int(11) NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE `kardex` (
   KEY `id_curso` (`id_curso`),
   CONSTRAINT `kardex_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `usuario` (`id`),
   CONSTRAINT `kardex_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `curso` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `transaccion` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -152,7 +152,7 @@ CREATE TABLE `transaccion` (
   KEY `id_curso` (`id_curso`),
   CONSTRAINT `transaccion_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `usuario` (`id`),
   CONSTRAINT `transaccion_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `curso` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -187,10 +187,10 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 
 
 
--- |||||||||||||||||||||||||||| VIEWS ||||||||||||||||||||||||||||||||
+-- |||||||||||||||||||||||||||| STORED PROCEDURES ||||||||||||||||||||||||||||||||
 
 DELIMITER $$
-CREATE PROCEDURE `sp_agregar_curso`(
+CREATE PROCEDURE `sp_agregar_curso`( 
     IN p_titulo VARCHAR(255),
     IN p_descripcion TEXT,
     IN p_precio DECIMAL(10,2),
@@ -207,7 +207,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_alumnos_inscritos`(
+CREATE PROCEDURE `sp_alumnos_inscritos`( -- Reporte de ventar por alumno (con o sin filtros)
     IN p_id_usuario INT,
     IN p_fecha_inicio DATE,
     IN p_fecha_fin DATE,
@@ -248,7 +248,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_consultar_usuario`(
+CREATE PROCEDURE `sp_consultar_usuario`( 
     IN p_id INT
 )
 BEGIN
@@ -331,7 +331,7 @@ CREATE PROCEDURE `sp_eliminar_usuario`(
     IN p_id INT
 )
 BEGIN
-    -- Si el usuario es un instructor, eliminar su información adicional
+    -- Si el usuario es un instructor
     IF (SELECT tipo_usuario FROM usuario WHERE id = p_id) = 2 THEN
         DELETE FROM instructor WHERE id = p_id;
     END IF;
@@ -342,7 +342,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_kardex_filtros`(
+CREATE PROCEDURE `sp_kardex_filtros`( -- Reporte de kardex
     IN p_id_alumno INT,
     IN p_fecha_inicio DATE,
     IN p_fecha_fin DATE,
@@ -374,7 +374,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_login`(
+CREATE PROCEDURE `sp_login`( 
     IN p_email VARCHAR(100),
     IN p_contrasena VARCHAR(255)
 )
@@ -387,7 +387,7 @@ BEGIN
     FROM usuario
     WHERE email = p_email AND contrasena = p_contrasena;
 
-    -- Si se encuentra un usuario, retorna el id y tipo de usuario
+    -- Rretorna el id y tipo de usuario
     IF v_id IS NOT NULL THEN
         SELECT v_id AS id, v_tipo_usuario AS tipo_usuario;
     ELSE
@@ -397,7 +397,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_niveles_curso`(
+CREATE PROCEDURE `sp_niveles_curso`( -- Agrega los niveles al curso creado 
     IN p_video VARCHAR(255),
     IN p_texto TEXT,
     IN p_numero INT 
@@ -415,7 +415,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_reporteUser`(
+CREATE PROCEDURE `sp_reporteUser`( -- Reporte para admins (1 para alumnos y 2 para maestros)
     IN p_Vista INT
 )
 BEGIN
@@ -452,7 +452,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE `sp_resumen_curso`( -- Muestra los cursos del profesor
+CREATE PROCEDURE `sp_resumen_curso`( -- Reporte de ventas del curso para profesor
     IN p_id_usuario INT,
     IN p_fecha_inicio DATE,
     IN p_fecha_fin DATE,
