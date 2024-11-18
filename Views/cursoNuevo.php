@@ -3,7 +3,7 @@ include '../conexion.php';
           $conexion = new conexion();
           $pdo = $conexion->conectar();
 
-/* 
+
 session_start(); // Inicia la sesión
 
 if (!isset($_SESSION['user_id'])) {
@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
             window.location.href = 'inicioSesion.php';
           </script>";
     exit();
-}*/
+}
 
 if ($pdo) {
 
@@ -60,66 +60,52 @@ if ($pdo) {
     <div class="container conLogo">
         <h1 class="titulos">A&B Cursos</h1>
         </div>
-    
-                       
-        <div class="container card"> <!--Navbar-->
 
-                            <nav class="navbar navbar-expand-lg navbar-light ">
-                              <div class="container-fluid">
-                                  <!-- Logo de la barra de navegación -->
-                                  <!-- <a class="navbar-brand" href="#">A&J</a> -->
-                                  
-                                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
-                                      <span class="navbar-toggler-icon"></span>
-                                  </button>
-                                  
-                                  <!-- Contenido oculto en dispositivos pequeños -->
-                                  <div class="collapse navbar-collapse" id="navbarOpciones">
-                                      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                          <li class="nav-item border-end">
-                                              <a class="nav-link active textos-2" aria-current="page" href="landPage.html">Principal</a>
-                                          </li>
+<!--Navbar-->
+        <div class="container card">
+
+            <nav class="navbar navbar-expand-lg navbar-light ">
+              <div class="container-fluid">
                   
-                                          <li class="nav-item border-end">
-                                              <a class="nav-link active textos-2" aria-current="page" href="perfil.html">Mi perfil</a>
-                                          </li>
                   
-                                          <li class="nav-item border-end">
-                                              <a class="nav-link active textos-2" aria-current="page" href="chat.html">Mis chats</a>
-                                          </li>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
+                      <span class="navbar-toggler-icon"></span>
+                  </button>
                   
-                                          
-                                          <!-- Desplegable de opciones -->
-                                          <li class="nav-item dropdown border-end">
-                                              <a class="nav-link dropdown-toggle textos-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                  Categorias
-                                              </a>
-                                              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                  <li><a class="dropdown-item textos-2" href="Busqueda.html">Arte</a></li>
-                                                  <li><a class="dropdown-item textos-2" href="Busqueda.html">Matematicas</a></li>
-                                                  <li><a class="dropdown-item textos-2" href="Busqueda.html">Programacion</a></li>
-                                                   <!--li><hr class="dropdown-divider"></li> 
-                                                  <li><a class="dropdown-item textos-2" href="#">Cerrar sesion</a></li--> <!--style letras rojas-->
-                   
-                                              </ul>
-                                          </li>
                   
-                                          <li class="nav-item"></li>
-                                              <a class="nav-link active textos-2" aria-current="page" href="inicioSesion.html">Cerrar sesion</a>
-                                          </li>
-                                      </ul>
+                  <div class="collapse navbar-collapse" id="navbarOpciones">
+                      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                          <li class="nav-item border-end">
+                              <a class="nav-link active textos-2" aria-current="page" href="landPage.php">Principal</a>
+                          </li>
+    
+                          <li class="nav-item border-end">
+                              <a class="nav-link active textos-2" aria-current="page" href="perfil.php">Mi perfil</a>
+                          </li>
+    
+                          <li class="nav-item border-end">
+                              <a class="nav-link active textos-2" aria-current="page" href="chat.php">Mis chats</a>
+                          </li>
+    
                           
-                                      <!-- Formulario de búsqueda ajustable -->
-                                      <form class="d-flex w-auto w-md-50 w-lg-50">
-                                          <input class="form-control me-2 textos-2" type="search" placeholder="Buscar" aria-label="Buscar">
-                                          <button class="btn btn-outline-dark textos-2" type="submit" formaction="Busqueda.html">Buscar</button>
-                                      </form>
                           
-                                  </div>
-                              </div>
-                          </nav>
-                          
+    
+                          <li class="nav-item">
+                              <a class="nav-link active textos-2" aria-current="page" href="../Controllers/logout.php">Cerrar sesion</a>
+                          </li>
+                      </ul>
+          
+                      <!-- Form de búsqueda  -->
+                      <form class="d-flex w-auto w-md-50 w-lg-50" method="POST" action="../Controllers/guardarBusqueda.php">
+                        <input class="form-control me-2 textos-2" type="search" name="textBuscar" placeholder="Buscar" aria-label="Buscar">
+                        <button class="btn btn-outline-dark textos-2" type="submit">Buscar</button>
+                    </form>
+          
                   </div>
+              </div>
+          </nav>
+          
+        </div>
 
 <div class="container mt-5 "  >
     <div class="card" > 

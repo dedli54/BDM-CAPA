@@ -131,8 +131,8 @@ document.getElementById('newUsuario').addEventListener('submit', function(event)
         alert(errores.join("\n"));
 
     } else {
-        alert("Usuario creado con exito :)");
-        window.location.href = 'inicioSesion.html';
+        //alert("Usuario creado con exito :)");
+        ////window.location.href = 'inicioSesion.html';
         //event.target.submit();
     }
 });

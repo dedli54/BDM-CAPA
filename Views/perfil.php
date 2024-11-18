@@ -1,3 +1,18 @@
+<?php
+session_start(); // Asegúrate de iniciar la sesión al principio del archivo PHP
+$textBuscar = isset($_SESSION['textBuscar']) ? htmlspecialchars($_SESSION['textBuscar']) : ''; // Verifica si 'textBuscar' está definido
+
+if (!isset($_SESSION['user_id'])) {
+    // Muestra un alert antes de redirigir
+    echo "<script>
+            alert('La sesión no está iniciada. Por favor, inicia sesión.');
+            window.location.href = 'inicioSesion.php';
+          </script>";
+    exit();
+}
+
+
+?>
 
 
 <!DOCTYPE HTML>
@@ -31,14 +46,13 @@
 
                             <nav class="navbar navbar-expand-lg navbar-light ">
                               <div class="container-fluid">
-                                  <!-- Logo de la barra de navegación -->
-                                  <!-- <a class="navbar-brand" href="#">A&J</a> -->
+                                  
                                   
                                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
                                       <span class="navbar-toggler-icon"></span>
                                   </button>
                                   
-                                  <!-- Contenido oculto en dispositivos pequeños -->
+                                  
                                   <div class="collapse navbar-collapse" id="navbarOpciones">
                                       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                           <li class="nav-item border-end">
@@ -50,41 +64,28 @@
                                           </li>
                   
                                           <li class="nav-item border-end">
-                                              <a class="nav-link active textos-2" aria-current="page" href="chat.html">Mis chats</a>
+                                              <a class="nav-link active textos-2" aria-current="page" href="chat.php">Mis chats</a>
                                           </li>
                   
                                           
-                                          <!-- Desplegable de opciones -->
-                                          <li class="nav-item dropdown border-end">
-                                              <a class="nav-link dropdown-toggle textos-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                  Categorias
-                                              </a>
-                                              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                  <li><a class="dropdown-item textos-2" href="Busqueda.html">Arte</a></li>
-                                                  <li><a class="dropdown-item textos-2" href="Busqueda.html">Matematicas</a></li>
-                                                  <li><a class="dropdown-item textos-2" href="Busqueda.html">Programacion</a></li>
-                                                   <!--li><hr class="dropdown-divider"></li> 
-                                                  <li><a class="dropdown-item textos-2" href="#">Cerrar sesion</a></li--> <!--style letras rojas-->
-                   
-                                              </ul>
-                                          </li>
+                                          
                   
                                           <li class="nav-item">
                                               <a class="nav-link active textos-2" aria-current="page" href="../Controllers/logout.php">Cerrar sesion</a>
                                           </li>
                                       </ul>
                           
-                                      <!-- Formulario de búsqueda ajustable -->
-                                      <form class="d-flex w-auto w-md-50 w-lg-50">
-                                          <input class="form-control me-2 textos-2" type="search" placeholder="Buscar" aria-label="Buscar">
-                                          <button class="btn btn-outline-dark textos-2" type="submit" formaction="Busqueda.html">Buscar</button>
-                                      </form>
+                                      <!-- Form de búsqueda  -->
+                                      <form class="d-flex w-auto w-md-50 w-lg-50" method="POST" action="../Controllers/guardarBusqueda.php">
+                                        <input class="form-control me-2 textos-2" type="search" name="textBuscar" placeholder="Buscar" aria-label="Buscar">
+                                        <button class="btn btn-outline-dark textos-2" type="submit">Buscar</button>
+                                    </form>
                           
                                   </div>
                               </div>
                           </nav>
                           
-                  </div>
+                        </div>
 
 
     <hr class="opZero">
@@ -126,39 +127,23 @@
 
       <div class="d-flex justify-content-end btnDiv">
 
-        <a href="chat.html"><button class="btn btn-lg btn-dark" type="submit">Mis chats</button></a>
+        <a href="chat.php"><button class="btn btn-lg btn-dark" type="submit">Mis chats</button></a>
 
       </div>
 
     <div class="container">
         <hr class="opZero">
-    <h2 class="titulos">Mis cursos</h2><hr>
+    <h2 class="titulos alumno">Cursos inscritos</h2><h2 class="titulos profesor">Mis cursos creados</h2><hr>
     </div>
     
     <div class="container cont-Cursos px-2 ">
         <div class="row rowCursos gx-5" >
     
-    
+        <p class="subtitulos-categoria">*Mostrar cursos inscritos o creados</p>
+        
             <!--Aqui agregar cada curso-->
     
             
-    
-            <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
-                <div class="row no-gutters">
-                    <div class="col-5">
-                        <div class="card-body">
-                            <h4 class="card-title subtitulos">Nombre curso</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Info de lo que se trata el curso</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
-                        </div>
-                    </div>
-                    <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                    </div>
-                </div>
-            </div>  
              
     
         </div>
@@ -170,15 +155,15 @@
         <div class="container">
             <hr class="opZero">
         <h2 class="titulos">Reportes</h2><hr>
-        <p class="subtitulos-categoria">*Solo se verá uno dependiendo el tipo de perfil (alumno, instructor ó admin)</p>
+        
         </div>
 
         <div class="container">
             <div class="row">
-                <div class="col d-flex justify-content-between">
-                    <a href="Kardex.html" class="btn btn-dark alumno">Ver Kardex</a>
-                    <a href="reportVenta.html" class="btn btn-dark profesor">Reporte de Ventas</a>
-                    <a href="reportUsers.html" class="btn btn-dark admin">Reporte de Usuarios</a>
+                <div class="col d-flex flex-column">
+                    <a href="Kardex.php" class="btn btn-dark alumno btn-block mb-2">Ver Kardex</a>
+                    <a href="reportVenta.php" class="btn btn-dark profesor btn-block mb-2">Reporte de Ventas</a>
+                    <a href="reportUsers.php" class="btn btn-dark admin btn-block mb-2">Reporte de Usuarios</a>
                 </div>
             </div>
         </div>
@@ -188,14 +173,15 @@
             <button class="btn btn-lg btn-dark admin" id="buyCurso">Agregar Categoria</button>
         </div>
         <div class="d-flex justify-content-end btnDiv"> 
-            <button class="btn btn-lg btn-dark admin" id="">Agregar Admin</button>
+            <!--<button class="btn btn-lg btn-dark admin" id=""  >Agregar Admin</button>  NewAdministrador -->
+            <a href="NewAdministrador.php" class="btn btn-lg btn-dark admin">Crear cuenta para Admin</a>
         </div>
             <hr class="opZero">
 
 
             <div class="d-flex justify-content-end btnDiv">
 
-            <a href="cursoNuevo.html"><button class="btn btn-lg btn-dark profesor" type="submit">Crear curso</button></a>
+            <a href="cursoNuevo.php"><button class="btn btn-lg btn-dark profesor" type="submit">Crear curso</button></a>
 
           </div>
 
@@ -253,5 +239,6 @@
     </footer>
 
     
-<script src="JS/perfil.js"></script>
+<script src="JS/comprarCurso2.js"></script>  <!-- Mostrar Ventana flotante  formBuy  -->
+<script src="JS/perfil.js"></script> <!-- Esconde las acciones de perfil dependiendo del tipo de usuario --> 
 </body>
