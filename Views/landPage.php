@@ -127,7 +127,7 @@ $pdo = null;
         <div class="container cont-Cursos px-2">
     <div class="row rowCursos gx-5">
         <?php foreach ($cursos_recientes as $curso): ?>
-            <div class="card col-lg col-md-5 col-sm-11 px-0">
+            <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
                 <div class="row no-gutters">
                     <div class="col-5">
                         <div class="card-body">
@@ -152,6 +152,9 @@ $pdo = null;
         <?php endforeach; ?>
     </div>
 </div>
+
+<!----->
+
 
         
         <div class="container"><hr>
