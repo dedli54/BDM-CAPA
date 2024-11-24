@@ -1,3 +1,50 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+require '../conexion.php';
+
+// test de conexcion 
+try {
+    $conexion = new conexion();
+    $pdo = $conexion->conectar();
+    
+    if (!$pdo) {
+        throw new Exception('Could not connect to database');
+    }
+} catch (Exception $e) {
+    die("Connection error: " . $e->getMessage());
+}
+
+
+$stmt = $pdo->prepare("SELECT nombre, apellidos FROM usuario WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$currentUser = $stmt->fetch();
+
+// get the fucking user list
+$stmt = $pdo->prepare("SELECT id, nombre, apellidos FROM usuario WHERE id != ?");
+$stmt->execute([$_SESSION['user_id']]);
+$users = $stmt->fetchAll();
+
+// selected chat messages
+$chat_with = isset($_GET['user']) ? $_GET['user'] : null;
+if ($chat_with) {
+    $stmt = $pdo->prepare(
+        "SELECT m.*, u.nombre as emisor_nombre 
+         FROM mensajes m 
+         JOIN usuario u ON m.emisor_id = u.id
+         WHERE (emisor_id = ? AND receptor_id = ?) 
+         OR (emisor_id = ? AND receptor_id = ?)
+         ORDER BY fecha_envio ASC"
+    );
+    $stmt->execute([$_SESSION['user_id'], $chat_with, $chat_with, $_SESSION['user_id']]);
+    $messages = $stmt->fetchAll();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,54 +112,55 @@
     </div>
 
     
-    <div class="card-chat">
-        <form id="chat">
-            <h3 class="col-9">Bandeja de entrada</h3>
-            <div class="container">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h3>Bienvenido a tus mensajes <?= htmlspecialchars($currentUser['nombre'] . ' ' . $currentUser['apellidos']) ?></h3>
+            </div>
+            <div class="card-body">
                 <div class="row">
-                        <div class="col-3">
-                            <div class="container mt-5">
-                                <form class="d-flex" role="search">
-                                    <input class="form-control me-2 busqueda-input" type="search" placeholder="Buscar..." aria-label="Search">
-                                    <button class="btn btn-outline-primary" type="submit">Buscar</button>
-                                </form>
-                            </div>
-                            <p class="mensajes">
-                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
-                                Chat 1
-                            </p>
-                            <p class="mensajes">
-                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
-                                Chat 2
-                            </p>
-                            <p class="mensajes">
-                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
-                                Chat 3
-                            </p>
-                            <p class="mensajes">
-                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
-                                Chat 4
-                            </p>
-                            <p class="mensajes">
-                                <img src="IMG/icon.png" alt="perfil" class="foto" width="50" height="50" style="border-radius: 10%;">
-                                Chat 5
-                            </p>
-                        </div>
-                    <div class="col-9 mensaje">
-                        <div class="profesor">
-                            Mensaje profesor
-                        </div>
-                        <div class="propio">
-                            Mensaje propio
+                    <!-- Users list -->
+                    <div class="col-md-4 border-right">
+                        <div class="users-list">
+                            <?php foreach ($users as $user): ?>
+                                <a href="?user=<?= $user['id'] ?>" class="user-item d-flex align-items-center p-2 border-bottom text-decoration-none">
+                                    <div class="user-info">
+                                        <span class="user-name"><?= htmlspecialchars($user['nombre'] . ' ' . $user['apellidos']) ?></span>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                        <div class="enviar">
-                            <input class="texto" placeholder="Escribe un texto">
-                            <button>Enviar</button>
-                        </div>
+                    
+                    <!-- Chat area -->
+                    <div class="col-md-8">
+                        <?php if ($chat_with): ?>
+                            <div class="chat-messages" id="chatMessages" style="height: 400px; overflow-y: auto;">
+                                <?php foreach ($messages as $message): ?>
+                                    <div class="message <?= $message['emisor_id'] == $_SESSION['user_id'] ? 'sent' : 'received' ?> p-2 mb-2">
+                                        <div class="message-content">
+                                            <?= htmlspecialchars($message['mensaje']) ?>
+                                        </div>
+                                        <small class="text-muted"><?= $message['fecha_envio'] ?></small>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <form action="send_message.php" method="POST" class="mt-3">
+                                <input type="hidden" name="receptor_id" value="<?= $chat_with ?>">
+                                <div class="input-group">
+                                    <input type="text" name="mensaje" class="form-control" placeholder="Escribe un mensaje..." required>
+                                    <button type="submit" class="btn btn-primary">Enviar</button>
+                                </div>
+                            </form>
+                        <?php else: ?>
+                            <div class="text-center pt-5">
+                                <p>Selecciona un usuario para comenzar un chat</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 
     <main class="flex-grow-1 container"></main>
