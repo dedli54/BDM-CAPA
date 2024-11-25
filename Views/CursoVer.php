@@ -181,12 +181,6 @@ try {
             <div id="congratsScreen" class="container card buyForms" style="display: none;">
                 <h2 class="titulos text-center">¡Felicitaciones!</h2>
                 <p class="textos text-center">Has completado el curso exitosamente.</p>
-                
-                <div class="text-center mb-4">
-                    <!-- Add diploma download button -->
-                    <a href="../Controllers/generarDiploma.php?curso_id=<?php echo $curso_id; ?>" 
-                    class="btn btn-success mb-3">Descargar Diploma</a>
-                </div>
 
                 <form action="../Controllers/crearComentario.php" method="POST" id="formComentario">
                     <input type="hidden" name="curso_id" value="<?php echo $curso_id; ?>">
@@ -207,8 +201,9 @@ try {
                         <textarea class="form-control" id="comentario" name="comentario" rows="3" required></textarea>
                     </div>
 
-                    <div class="text-center">
+                    <div class="text-center d-flex justify-content-center gap-3">
                         <button type="submit" class="btn btn-dark">Enviar comentario</button>
+                        <button type="button" onclick="showDiploma(<?php echo $curso_id; ?>)" class="btn btn-dark">Ver Diploma</button>
                     </div>
                 </form>
             </div>
@@ -287,6 +282,24 @@ try {
             mostrarNivel(nivelActual);
         }
     });
+
+    function showDiploma(cursoId) {
+        // Create iframe to hold diploma content
+        const iframe = document.createElement('iframe');
+        iframe.name = 'diplomaFrame';
+        iframe.style.width = '100%';
+        iframe.style.height = '600px';
+        iframe.style.border = 'none';
+        
+        // Load diploma content into modal
+        document.getElementById('diplomaContent').innerHTML = '';
+        document.getElementById('diplomaContent').appendChild(iframe);
+        iframe.src = `diploma.php?id=${cursoId}`;
+        
+        // Show modal
+        const diplomaModal = new bootstrap.Modal(document.getElementById('diplomaModal'));
+        diplomaModal.show();
+    }
     </script>
 
 
@@ -356,5 +369,24 @@ try {
     <script src="JS/addComent.js"></script>
     
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
+
+<!-- Add this right before the closing </body> tag in CursoVer.php -->
+<div class="modal fade" id="diplomaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Diploma</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="diplomaContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-dark" onclick="window.frames['diplomaFrame'].print()">Imprimir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
