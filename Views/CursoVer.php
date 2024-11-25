@@ -173,6 +173,11 @@ try {
             <div class="d-flex justify-content-between mt-4">
                 <button class="btn btn-dark" id="btnAnterior">Nivel Anterior</button>
                 <button class="btn btn-dark" id="btnSiguiente">Siguiente Nivel</button>
+                
+                <button class="btn btn-dark" id="addComentBtn">Agregar comentario</button> <!-- Ver cuando sea el ultimo nivel
+                + Solo ver si aún no agrega un comentario
+                + Al agregarlo ya podrá ver su Diploma-->
+
             </div>
         <?php endif; ?>
     </div>
@@ -180,70 +185,67 @@ try {
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const niveles = document.querySelectorAll('[id^="nivel-"]');
-        let nivelActual = 0;
+        let nivelActual = <?php 
+            // current progress
+            $stmt = $pdo->prepare("SELECT nivel_actual FROM progreso_curso 
+                                  WHERE id_alumno = ? AND id_curso = ?");
+            $stmt->execute([$_SESSION['user_id'], $curso_id]);
+            $progreso = $stmt->fetch();
+            echo $progreso ? $progreso['nivel_actual'] - 1 : 0;
+        ?>;
 
         function mostrarNivel(index) {
+            // hide levels
             niveles.forEach((nivel, i) => {
                 nivel.style.display = i === index ? 'block' : 'none';
             });
             
+            // botton visibility 
             document.getElementById('btnAnterior').style.display = index > 0 ? 'block' : 'none';
             document.getElementById('btnSiguiente').style.display = index < niveles.length - 1 ? 'block' : 'none';
+            document.getElementById('addComentBtn').style.display = index === niveles.length - 1 ? 'block' : 'none';
+
+            // save progress
+            fetch('../Controllers/actualizarProgreso.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    curso_id: <?php echo $curso_id; ?>,
+                    nivel: index + 1
+                })
+            }).catch(error => console.error('Error:', error));
+
+            // update current level
+            nivelActual = index;
         }
 
-        document.getElementById('btnAnterior').addEventListener('click', () => {
-            if (nivelActual > 0) mostrarNivel(--nivelActual);
+        
+        document.getElementById('btnAnterior').addEventListener('click', function() {
+            if (nivelActual > 0) {
+                mostrarNivel(nivelActual - 1);
+            }
         });
 
-        document.getElementById('btnSiguiente').addEventListener('click', () => {
-            if (nivelActual < niveles.length - 1) mostrarNivel(++nivelActual);
+        document.getElementById('btnSiguiente').addEventListener('click', function() {
+            if (nivelActual < niveles.length - 1) {
+                mostrarNivel(nivelActual + 1);
+            }
         });
 
-        // Show first level initially
-        if(niveles.length > 0) {
-            mostrarNivel(0);
+        // 
+        if (niveles.length > 0) {
+            mostrarNivel(nivelActual);
         }
     });
     </script>
 
-    <!--    Comentarios     -->
-        <div class="container mt-4 comentCont justify-content-center">
 
-            <h4 class="subtitulos">Comentarios de gente que terminó el curso:</h4>
 
-            <div class="row centro-vertical">
-            <div class="col-2 text-center">
-                <!-- Foto de perfil -->
-                <img src="IMG/sql.png" alt="Foto de Perfil" class="foto-perfil">
-            </div>
-            <div class="col-9">
-                <div class="comentario">
-                
-                <div class="calificacion">Juan Pérez</div>
-                <div class="calificacion">Calificación: ★★★☆☆</div>
-                
-                <p>Este curso le falto algo más de info.</p>
-                </div>
-            </div>
-            </div>
-            <hr class="w-75 mx-auto">
-            <div class="row centro-vertical">
-                <div class="col-2 text-center">
-                    <!-- Foto de perfil -->
-                    <img src="IMG/sql.png" alt="Foto de Perfil" class="foto-perfil">
-                </div>
-                <div class="col-9">
-                    <div class="comentario">
-                    
-                    <div class="calificacion">Jose Aureliano</div>
-                    <div class="calificacion">Calificación: ★★★★★</div>
-                    
-                    <p>Este curso está muy completo. Recomendadisimo.</p>
-                    </div>
-                </div>
-                </div>
-        </div>
 
+   
     <main class="flex-grow-1 container">
     <hr class="opZero"><hr class="opZero"><hr class="opZero">
 
@@ -259,6 +261,52 @@ try {
         </div>
     </footer>
 
+
+        <!--                FORMS OCULTO PARA AGREGAR COMENTARIO         
+            <button class="btn btn-lg btn-dark admin" id="buyCurso">Agregar comentario</button> -->
+
+        <div id="overlay" class="overlay"></div>
+        <div class="container card buyForms" id="formCategoria">
+            
+                        <form action="../Controllers/crearComentario.php" method="POST" id="formComentario"> 
+
+                            
+
+                            <div class="row d-flex justify-content-center">
+                                <div class="col-7">
+                                    <div class="mb-3">
+                                    <label for="Calificacion" class="form-label">Calificacion:</label>
+
+                                    <select id="Calificacion" name="Calificacion" class="form-select">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                    <label for="Comentario" class="form-label">Comentario:</label>
+                                    <input type="text" class="form-control" id="Comentario" name="Comentario" placeholder="Comentarios sobre el curso" required>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-end "> 
+                                <button type="submit" class="btn btn-lg btn-dark" id="buyCurso">Agregar</button> <!--No importa mucho el ID porque se manda como SUBMIT-->
+                              </div>
+
+                              
+
+                        </form>
+                    
+        </div>    
+<!---->
+    <script src="JS/addComent.js"></script>
     
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
 </body>

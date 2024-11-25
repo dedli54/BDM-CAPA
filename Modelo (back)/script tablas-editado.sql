@@ -1293,3 +1293,37 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CREATE TABLE progreso_curso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_alumno INT NOT NULL,
+    id_curso INT NOT NULL,
+    nivel_actual INT DEFAULT 1,
+    completado BOOLEAN DEFAULT FALSE,
+    ultima_fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_alumno) REFERENCES usuario(id),
+    FOREIGN KEY (id_curso) REFERENCES curso(id),
+    UNIQUE KEY unique_progreso (id_alumno, id_curso)
+);
+
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_progreso(
+    IN p_id_alumno INT,
+    IN p_id_curso INT, 
+    IN p_nivel_actual INT
+)
+BEGIN
+    INSERT INTO progreso_curso (id_alumno, id_curso, nivel_actual)
+    VALUES (p_id_alumno, p_id_curso, p_nivel_actual)
+    ON DUPLICATE KEY UPDATE 
+        nivel_actual = p_nivel_actual,
+        ultima_fecha = CURRENT_TIMESTAMP;
+        
+    -- Mark as completed if reached final level
+    UPDATE progreso_curso pc
+    SET pc.completado = true 
+    WHERE pc.id_alumno = p_id_alumno 
+    AND pc.id_curso = p_id_curso
+    AND pc.nivel_actual >= (SELECT COUNT(*) FROM nivelesCurso WHERE id_curso = p_id_curso);
+END //
+DELIMITER ;
