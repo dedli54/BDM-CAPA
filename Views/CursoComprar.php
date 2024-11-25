@@ -11,17 +11,21 @@ try {
     $conexion = new conexion(); 
     $pdo = $conexion->conectar();
     
-    //  Query para ver la visat 
+    // Get course details
     $stmt = $pdo->prepare("SELECT * FROM vista_curso_detalle WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $curso = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if (!$curso) {
-        throw new Exception('Course not found');
-    }
-    
-    $stmt->closeCursor();
-    $pdo = null;
+    // Get course comments
+    $stmt = $pdo->prepare("
+        SELECT c.*, u.nombre as nombre_alumno, c.calificacion
+        FROM comentario c
+        JOIN usuario u ON c.id_alumno = u.id 
+        WHERE c.id_curso = ?
+        ORDER BY c.fecha DESC
+    ");
+    $stmt->execute([$_GET['id']]);
+    $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
 } catch (Exception $e) {
     die("Error: " . $e->getMessage());
@@ -143,51 +147,45 @@ try {
 
         
 
-        <div class="d-flex justify-content-end btnDiv"> 
-            <button class="btn btn-lg btn-dark" id="buyCurso">Comprar curso ($100.50)</button>
-          </div>
+
 
     </div>
     
 
 
     <!--    Comentarios     -->
-        <div class="container mt-4 comentCont justify-content-center">
+    <div class="container mt-4 comentCont justify-content-center">
+        <h4 class="subtitulos">Comentarios de gente que terminó el curso:</h4>
 
-            <h4 class="subtitulos">Comentarios de gente que terminó el curso:</h4>
-
-            <div class="row centro-vertical">
-            <div class="col-2 text-center">
-                <!-- Foto de perfil -->
-                <img src="IMG/sql.png" alt="Foto de Perfil" class="foto-perfil">
-            </div>
-            <div class="col-9">
-                <div class="comentario">
-                
-                <div class="calificacion">Juan Pérez</div>
-                <div class="calificacion">Calificación: ★★★☆☆</div>
-                
-                <p>Este curso le falto algo más de info.</p>
-                </div>
-            </div>
-            </div>
-            <hr class="w-75 mx-auto">
-            <div class="row centro-vertical">
-                <div class="col-2 text-center">
-                    <!-- Foto de perfil -->
-                    <img src="IMG/sql.png" alt="Foto de Perfil" class="foto-perfil">
-                </div>
-                <div class="col-9">
-                    <div class="comentario">
-                    
-                    <div class="calificacion">Jose Aureliano</div>
-                    <div class="calificacion">Calificación: ★★★★★</div>
-                    
-                    <p>Este curso está muy completo. Recomendadisimo.</p>
+        <?php if (empty($comentarios)): ?>
+            <p class="text-center textos">Aún no hay comentarios para este curso.</p>
+        <?php else: ?>
+            <?php foreach ($comentarios as $comentario): ?>
+                <div class="row centro-vertical">
+                    <div class="col-2 text-center">
+                        <img src="IMG/user-default.png" alt="Foto de Perfil" class="foto-perfil">
+                    </div>
+                    <div class="col-9">
+                        <div class="comentario">
+                            <div class="calificacion"><?= htmlspecialchars($comentario['nombre_alumno']) ?></div>
+                            <div class="calificacion">
+                                Calificación: <?php 
+                                    $stars = str_repeat('★', $comentario['calificacion']) . 
+                                            str_repeat('☆', 5 - $comentario['calificacion']);
+                                    echo $stars;
+                                ?>
+                            </div>
+                            <p><?= htmlspecialchars($comentario['texto']) ?></p>
+                            <small class="text-muted">
+                                <?= date('d/m/Y', strtotime($comentario['fecha'])) ?>
+                            </small>
+                        </div>
                     </div>
                 </div>
-                </div>
-        </div>
+                <hr class="w-75 mx-auto">
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 
         <!--                FORMS OCULTO PARA PAGAR         -->
         <div id="overlay" class="overlay"></div>

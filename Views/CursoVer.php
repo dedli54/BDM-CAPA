@@ -148,7 +148,7 @@ try {
             </div>
         <?php else: ?>
             <?php foreach($niveles as $nivel): ?>
-                <div class="row nivel" id="nivel-<?= $nivel['numeroNivel'] ?>">
+                <div class="row nivel" id="nivel-<?= $nivel['numeroNivel'] ?>" style="display: none;">
                     <hr class="opZero">
                     <h3 class="subtitulos">Nivel <?= htmlspecialchars($nivel['numeroNivel']) ?></h3>
                     <div class="col">
@@ -174,10 +174,43 @@ try {
                 <button class="btn btn-dark" id="btnAnterior">Nivel Anterior</button>
                 <button class="btn btn-dark" id="btnSiguiente">Siguiente Nivel</button>
                 
-                <button class="btn btn-dark" id="addComentBtn">Agregar comentario</button> <!-- Ver cuando sea el ultimo nivel
-                + Solo ver si aún no agrega un comentario
-                + Al agregarlo ya podrá ver su Diploma-->
+                <!-- Replace comment button with finish button -->
+                <button class="btn btn-dark" id="finishCourseBtn" style="display: none;">Finalizar Curso</button>
+            </div>
 
+            <div id="congratsScreen" class="container card buyForms" style="display: none;">
+                <h2 class="titulos text-center">¡Felicitaciones!</h2>
+                <p class="textos text-center">Has completado el curso exitosamente.</p>
+                
+                <div class="text-center mb-4">
+                    <!-- Add diploma download button -->
+                    <a href="../Controllers/generarDiploma.php?curso_id=<?php echo $curso_id; ?>" 
+                    class="btn btn-success mb-3">Descargar Diploma</a>
+                </div>
+
+                <form action="../Controllers/crearComentario.php" method="POST" id="formComentario">
+                    <input type="hidden" name="curso_id" value="<?php echo $curso_id; ?>">
+                    
+                    <div class="mb-3">
+                        <label for="calificacion" class="form-label">Califica el curso:</label>
+                        <select class="form-select" id="calificacion" name="calificacion" required>
+                            <option value="5">★★★★★ Excelente</option>
+                            <option value="4">★★★★☆ Muy bueno</option>
+                            <option value="3">★★★☆☆ Bueno</option>
+                            <option value="2">★★☆☆☆ Regular</option>
+                            <option value="1">★☆☆☆☆ Necesita mejorar</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="comentario" class="form-label">Deja tu comentario:</label>
+                        <textarea class="form-control" id="comentario" name="comentario" rows="3" required></textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-dark">Enviar comentario</button>
+                    </div>
+                </form>
             </div>
         <?php endif; ?>
     </div>
@@ -186,26 +219,29 @@ try {
     document.addEventListener('DOMContentLoaded', function() {
         const niveles = document.querySelectorAll('[id^="nivel-"]');
         let nivelActual = <?php 
-            // current progress
-            $stmt = $pdo->prepare("SELECT nivel_actual FROM progreso_curso 
-                                  WHERE id_alumno = ? AND id_curso = ?");
+            $stmt = $pdo->prepare("SELECT nivel_actual FROM progreso_curso WHERE id_alumno = ? AND id_curso = ?");
             $stmt->execute([$_SESSION['user_id'], $curso_id]);
             $progreso = $stmt->fetch();
-            echo $progreso ? $progreso['nivel_actual'] - 1 : 0;
+            echo $progreso ? ($progreso['nivel_actual'] - 1) : 0;
         ?>;
 
         function mostrarNivel(index) {
-            // hide levels
-            niveles.forEach((nivel, i) => {
-                nivel.style.display = i === index ? 'block' : 'none';
+            // Hide all levels first
+            niveles.forEach(nivel => {
+                nivel.style.display = 'none';
             });
             
-            // botton visibility 
+            // Show current level
+            if (niveles[index]) {
+                niveles[index].style.display = 'block';
+            }
+            
+            // Update button visibility
             document.getElementById('btnAnterior').style.display = index > 0 ? 'block' : 'none';
             document.getElementById('btnSiguiente').style.display = index < niveles.length - 1 ? 'block' : 'none';
-            document.getElementById('addComentBtn').style.display = index === niveles.length - 1 ? 'block' : 'none';
+            document.getElementById('finishCourseBtn').style.display = index === niveles.length - 1 ? 'block' : 'none';
 
-            // save progress
+            // Save progress
             fetch('../Controllers/actualizarProgreso.php', {
                 method: 'POST',
                 headers: {
@@ -216,13 +252,19 @@ try {
                     curso_id: <?php echo $curso_id; ?>,
                     nivel: index + 1
                 })
-            }).catch(error => console.error('Error:', error));
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.isCompleted) {
+                    document.getElementById('finishCourseBtn').disabled = false;
+                }
+            })
+            .catch(error => console.error('Error:', error));
 
-            // update current level
             nivelActual = index;
         }
 
-        
+        // Navigation button event listeners
         document.getElementById('btnAnterior').addEventListener('click', function() {
             if (nivelActual > 0) {
                 mostrarNivel(nivelActual - 1);
@@ -235,7 +277,12 @@ try {
             }
         });
 
-        // 
+        document.getElementById('finishCourseBtn').addEventListener('click', function() {
+            document.getElementById('congratsScreen').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        });
+
+        // Show initial level
         if (niveles.length > 0) {
             mostrarNivel(nivelActual);
         }
