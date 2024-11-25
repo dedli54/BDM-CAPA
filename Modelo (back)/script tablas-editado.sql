@@ -1152,3 +1152,60 @@ DELIMITER ;
 -- select * from kardex
 
 call sp_reporteUser (2)
+
+-- correct table of transaccion XD
+CREATE TABLE IF NOT EXISTS transaccion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_alumno INT NOT NULL,
+    id_curso INT NOT NULL,
+    monto DECIMAL(10,2) NOT NULL,
+    numero_tarjeta VARCHAR(16),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_alumno) REFERENCES usuario(id),
+    FOREIGN KEY (id_curso) REFERENCES curso(id)
+);
+
+DELIMITER $$
+CREATE PROCEDURE sp_comprar_curso(
+    IN p_id_alumno INT,
+    IN p_id_curso INT,
+    IN p_numero_tarjeta VARCHAR(16),
+    IN p_fecha_vencimiento VARCHAR(5),
+    IN p_ccv VARCHAR(3)
+)
+BEGIN
+    DECLARE v_monto DECIMAL(10,2);
+    
+    SELECT precio INTO v_monto 
+    FROM curso 
+    WHERE id = p_id_curso;
+    
+    START TRANSACTION;
+    
+    INSERT INTO transaccion (
+        id_alumno, 
+        id_curso,
+        monto,
+        numero_tarjeta,
+        fecha
+    ) VALUES (
+        p_id_alumno,
+        p_id_curso, 
+        v_monto,
+        p_numero_tarjeta,
+        NOW()
+    );
+    
+    INSERT INTO inscripcion (
+        id_alumno,
+        id_curso,
+        fecha_inscripcion
+    ) VALUES (
+        p_id_alumno,
+        p_id_curso,
+        NOW()
+    );
+    
+    COMMIT;
+END$$
+DELIMITER ;
