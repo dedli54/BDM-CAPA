@@ -1209,3 +1209,25 @@ BEGIN
     COMMIT;
 END$$
 DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_obtener_cursos_comprados(
+    IN p_id_alumno INT
+)
+BEGIN
+    SELECT 
+        c.id,
+        c.titulo,
+        c.descripcion,
+        c.precio,
+        c.foto,
+        cat.nombre as categoria,
+        CONCAT(u.nombre, ' ', u.apellidos) as autor
+    FROM curso c
+    JOIN categoria cat ON c.id_categoria = cat.id 
+    JOIN usuario u ON c.id_maestro = u.id
+    JOIN inscripcion i ON c.id = i.id_curso
+    WHERE i.id_alumno = p_id_alumno
+    AND c.status = 1;
+END$$
+DELIMITER ;

@@ -36,6 +36,12 @@ $stmt->execute();
 $cursos_vendidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
 
+// the bought courses are called here
+$stmt = $pdo->prepare("CALL sp_obtener_cursos_comprados(?)");
+$stmt->execute([$_SESSION['user_id']]);
+$cursos_comprados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
 $pdo = null;
 ?>
 
@@ -118,8 +124,8 @@ $pdo = null;
     <hr class="opZero">
     
         <div class="container">
-            <h2 class="titulos">Cursos recientes</h2>
-            <p class="textos"> Aquí encontrarás los cursos recien agregados a nuestra plataforma.</p>
+            <h2 class="titulos">Cursos disponibles</h2>
+            <p class="textos"> Aquí encontrarás los cursos disponibles en la plataforma.</p>
         </div>      
           
           
@@ -158,89 +164,42 @@ $pdo = null;
 
         
         <div class="container"><hr>
-            <h2 class="titulos">Top ventas</h2>
-            <p class="textos">Aquí se mostrarán los cursos más vendidos</p>
+            <h2 class="titulos">Cursos comprados</h2>
+            <p class="textos">Aquí estan tus cursos comprados</p>
         </div>  
 
-
-                  <!--                                                                Cajita con cursos-->
-                  <div class="container cont-Cursos px-2">
-                    <div class="row rowCursos gx-5">
-                        <?php foreach ($cursos_vendidos as $curso): ?>
-                            <!-- Same card structure as above -->
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-        <div class="container"><hr>
-            <h2 class="titulos">Mejor calificados</h2>
-            <p class="textos">Aquí se mostrarán todos los cursos con mejor califiación</p>
-        </div>  
-
-
-                  <!--                                                                 Cajita con cursos-->
-                  <div class="container cont-Cursos px-2 ">
-                    <div class="row rowCursos gx-5" >
-                
-                
-                        <!--Aqui agregar cada curso-->
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0" >
+        <div class="container cont-Cursos px-2">
+            <div class="row rowCursos gx-5">
+                <?php if (!empty($cursos_comprados)): ?>
+                    <?php foreach ($cursos_comprados as $curso): ?>
+                        <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
                             <div class="row no-gutters">
                                 <div class="col-5">
                                     <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso...</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="CursoComprar.html" class="btn btn-primary btn-sm">Leer más</a>
+                                        <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['titulo']) ?></h4>
+                                        <p class="subtitulos-categoria small">
+                                            <?= htmlspecialchars($curso['autor']) ?> | <?= htmlspecialchars($curso['categoria']) ?>
+                                        </p>
+                                        <p class="textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
+                                        <p class="textos">Costo $<?= number_format($curso['precio'], 2) ?></p>
+                                        <a href="CursoVer.php?id=<?= $curso['id'] ?>" class="btn btn-primary btn-sm">Ver curso</a>
                                     </div>
                                 </div>
                                 <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
+                                    <img class="img-fluid h-100 imgCard" 
+                                         src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
+                                         alt="Imagen del curso">
                                 </div>
                             </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>          
-                
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12 text-center">
+                        <p class="textos">No has comprado ningún curso todavía.</p>
                     </div>
-                
-                        
-                
-                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
 
         <main class="flex-grow-1 container">
