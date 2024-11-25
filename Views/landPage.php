@@ -25,16 +25,13 @@ try {
 }
 
 // agarrar los cursos recientes
-$stmt = $pdo->prepare("CALL sp_obtener_cursos(0, 'recientes')");
-$stmt->execute();
+$stmt = $pdo->prepare("CALL sp_obtener_cursos(?, ?, ?)");
+$stmt->execute([0, 'recientes', $_SESSION['user_id']]);
 $cursos_recientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
 
 // los mas vendidos  
-$stmt = $pdo->prepare("CALL sp_obtener_cursos(0, 'vendidos')");
-$stmt->execute();
-$cursos_vendidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$stmt->closeCursor();
+
 
 // the bought courses are called here
 $stmt = $pdo->prepare("CALL sp_obtener_cursos_comprados(?)");

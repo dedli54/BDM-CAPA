@@ -1231,3 +1231,65 @@ BEGIN
     AND c.status = 1;
 END$$
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_obtener_cursos(
+    IN p_categoria_id INT,
+    IN p_tipo VARCHAR(20), -- 'recientes', 'vendidos', 'calificados'
+    IN p_user_id INT
+)
+BEGIN
+    CASE p_tipo
+        WHEN 'recientes' THEN
+            -- Get recently added courses excluding purchased ones
+            SELECT 
+                c.id,
+                c.titulo,
+                c.descripcion,
+                c.precio,
+                c.foto,
+                cat.nombre as categoria,
+                CONCAT(u.nombre, ' ', u.apellidos) as autor
+            FROM curso c
+            JOIN categoria cat ON c.id_categoria = cat.id 
+            JOIN usuario u ON c.id_maestro = u.id
+            WHERE (c.id_categoria = p_categoria_id OR p_categoria_id = 0)
+            AND c.status = 1
+            AND c.id NOT IN (
+                SELECT id_curso 
+                FROM inscripcion 
+                WHERE id_alumno = p_user_id
+            )
+            ORDER BY c.fe_Creacion DESC
+            LIMIT 6;
+            
+        WHEN 'vendidos' THEN
+            -- Get most sold courses excluding purchased ones
+            SELECT 
+                c.id,
+                c.titulo,
+                c.descripcion,
+                c.precio,
+                c.foto,
+                cat.nombre as categoria,
+                CONCAT(u.nombre, ' ', u.apellidos) as autor,
+                COUNT(i.id_curso) as total_ventas
+            FROM curso c
+            JOIN categoria cat ON c.id_categoria = cat.id
+            JOIN usuario u ON c.id_maestro = u.id
+            LEFT JOIN inscripcion i ON c.id = i.id_curso
+            WHERE (c.id_categoria = p_categoria_id OR p_categoria_id = 0)
+            AND c.status = 1
+            AND c.id NOT IN (
+                SELECT id_curso 
+                FROM inscripcion 
+                WHERE id_alumno = p_user_id
+            )
+            GROUP BY c.id
+            ORDER BY total_ventas DESC
+            LIMIT 6;
+    END CASE;
+END $$
+
+DELIMITER ;
