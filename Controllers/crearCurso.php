@@ -1,6 +1,6 @@
 <?php
 // header('Content-Type: application/json');
-// session_start();
+session_start();
 require '../conexion.php';
 
 $response = ['success' => false, 'message' => ''];//JSON
@@ -19,7 +19,7 @@ try {
     $descripcion = $_POST['p_descripcion'];
     $precio = (float)$_POST['p_precio'];
     $contenido = $_POST['p_contenido'];
-    $id_maestro = (int)$_POST['p_id_maestro'];
+    $id_maestro = (int)$_SESSION['user_id'];
     $id_categoria = (int)$_POST['p_id_categoria'];
 
     // Manejar la imagen

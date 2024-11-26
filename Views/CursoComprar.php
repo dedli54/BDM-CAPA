@@ -18,14 +18,25 @@ try {
     
     // Get course comments
     $stmt = $pdo->prepare("
-        SELECT c.*, u.nombre as nombre_alumno, c.calificacion
+        SELECT c.*, u.nombre as nombre_alumno, u.foto, c.calificacion
         FROM comentario c
         JOIN usuario u ON c.id_alumno = u.id 
         WHERE c.id_curso = ?
         ORDER BY c.fecha DESC
     ");
     $stmt->execute([$_GET['id']]);
+
+    if ($curso['foto']) {
+        $fotoBase64 = base64_encode($curso['foto']);
+        $fotoSrc = "data:image/jpeg;base64," . $fotoBase64;
+    } else {
+        // Imagen predeterminada
+        $fotoSrc = "IMG/sql.png";
+    }
+
     $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
     
 } catch (Exception $e) {
     die("Error: " . $e->getMessage());
@@ -119,7 +130,7 @@ try {
 
                 <div class="row allign-items-center">
                     <div class="col-12 col-md-4">
-                            <img id="imgPerfil" class="rounded-2 img-curso" alt="Foto de perfil" src="IMG\sql.png" >
+                            <img id="imgPerfil" class="rounded-2 img-curso" alt="Foto de curso" src="<?php echo $fotoSrc; ?>">
 
                     </div>
                     <div class="col-11 col-md-8"> 
@@ -163,7 +174,20 @@ try {
             <?php foreach ($comentarios as $comentario): ?>
                 <div class="row centro-vertical">
                     <div class="col-2 text-center">
-                        <img src="IMG/user-default.png" alt="Foto de Perfil" class="foto-perfil">
+
+                        <?php 
+                            if ($comentario['foto']) {
+                                $fotoccBase64 = base64_encode($comentario['foto']);
+                                $fotoccSrc = "data:image/jpeg;base64," . $fotoccBase64;
+                            } else {
+                                // Imagen predeterminada
+                                $fotoccSrc = "IMG/icon.png";
+                            }
+
+                        ?>
+
+
+                        <img id="imgPerfil" class="rounded-2 foto-perfil" alt="Foto de perfil" src="<?php echo $fotoccSrc; ?>">
                     </div>
                     <div class="col-9">
                         <div class="comentario">

@@ -1,5 +1,3 @@
-
-
 //Funcion para mostrar la imagen
 /*document.getElementById('foto').addEventListener('change', function(event) {
     const file = event.target.files[0]; 
@@ -123,134 +121,59 @@ document.getElementById('cNivel').addEventListener('input', function(event) {
 
 //Validar el curso
 document.getElementById('dynamicForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    let errores = [];
     
-        event.preventDefault();
-        let errores = [];
-    
-        const cName = document.getElementById('cName').value.trim();
-        const cDesc = document.getElementById('cDesc').value.trim();
+    const cName = document.getElementById('cName').value.trim();
+    const cDesc = document.getElementById('cDesc').value.trim();
+    const cTotal = document.getElementById('cTotal').value.trim();
+    const categoria = document.getElementById('cCategoria').value;
+    const img = document.getElementById('foto').files[0];
+    const cursoId = document.querySelector('input[name="curso_id"]').value;
 
-        const img = document.getElementById('foto').files[0];
+    // Validaciones
+    if (!cName || !cDesc) {
+        errores.push("Título y descripción son obligatorios");
+    }
 
-        const cGratis = document.getElementById('cGratis');
-        const gratisBool = cGratis.checked;
+    if (categoria === 'Categoria') {
+        errores.push("Debes seleccionar una categoría");
+    }
 
-        const cTotal = document.getElementById('cTotal').value.trim();
-        const cNivel = document.getElementById('cNivel').value.trim();
+    if (errores.length > 0) {
+        alert(errores.join("\n"));
+        return;
+    }
 
-        const freeLvl = document.getElementById('freeLvl').value; //No se usa aún
+    // Enviar datos
+    const formData = new FormData();
+    formData.append('p_titulo', cName);
+    formData.append('p_descripcion', cDesc);
+    formData.append('p_precio', cTotal);
+    formData.append('p_id_categoria', categoria);
+    formData.append('p_id_curso', cursoId);
+    if (img) {
+        formData.append('p_foto', img);
+    }
 
-        //Validar txt
-        if (cName === "" || cDesc ===""  ) {
-            errores.push("Falta llenar nombre o descripcion");
+    fetch('../Controllers/editCurso.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Curso actualizado exitosamente');
+            window.location.href = 'perfil.php';
+        } else {
+            alert('Error: ' + data.message);
         }
-
-        //Val de precios
-        if(!cGratis.checked){
-
-
-            if (cTotal === "" || cNivel ===""  ) {
-                errores.push("Faltó informacion de costos");
-            }else{
-
-                const tot = parseFloat(cTotal);
-                const lvl = parseFloat(cNivel);
-
-                if(lvl >= tot)
-                errores.push("Costo de nivel no puede ser menor");
-
-
-
-            }
-
-        }
-
-        //categoria e imagen
-        const categoria = document.getElementById('cCategoria').value;
-        if (categoria === 'Categoria') {
-                errores.push('Debes seleccionar una categoría');
-            }
-    
-        if (!img) {
-                errores.push('Debes seleccionar una imagen');
-            }
-
-
-        // Validar que cada nivel tenga texto o video      
-        const numFieldsSelect = document.getElementById('numFields');
-
-        
-        
-
-            // Validacion de que todos los niveles tengan info
-            const numFields = parseInt(numFieldsSelect.value);
-
-        let allFieldsValid = true; // Para verificar todos los campos
-        let videos = 0; // Para verificar todos los campos
-        
-
-        for (let i = 1; i <= numFieldsSelect.value; i++) {
-                const textInput = document.getElementById(`text${i}`);
-                const fileInput = document.getElementById(`file${i}`);
-                const textValue = textInput.value.trim();
-                const fileValue = fileInput.files.length > 0;
-    
-                
-
-                if(fileValue){
-                    videos = videos + 1; //Cuenta los videos
-                }
-    
-                if (!textValue && !fileValue) {
-                    allFieldsValid = false; // No hay texto ni archivo
-                    errores.push(`Nivel ${i} no tiene informacion`);
-                }
-        }
-
-        if (numFields <= 0) {
-            errores.push("Selecciona una cantidad de niveles");
-
-        }else
-            if (videos === 0) {
-                    errores.push("Debe haber al menos un video");
-
-            }
-
-    
-
-        //FINAL
-        if (errores.length > 0) {
-            alert(errores.join("\n"));
-    
-        } else { //3raE: terminó las validaciones del JS ahora manda a llamar al php
-
-            // parseInt(localStorage.getItem('idProfe')) || 1; 
-            const idProfe = parseInt(1); //3raE: obtener despues del localstorage
-            // categoria llenar combobox con SP de categorias
-            const csCategoria = parseInt(categoria);
-            const tot = parseFloat(cTotal);
-
-            //enviarPhpNewCurso({cName,cDesc,img,tot,idProfe,csCategoria});
-
-            /*
-            
-            CREATE PROCEDURE sp_agregar_curso (
-                IN p_titulo VARCHAR(255),
-                IN p_descripcion TEXT,
-                IN p_precio DECIMAL(10,2),        --cTotal
-                IN p_contenido TEXT,            --cDesc
-                IN p_id_maestro INT,
-                IN p_id_categoria INT,
-                IN p_foto BLOB 
-            
-            */
-
-
-            alert("Subiendo datos del curso...");
-            //window.location.href = 'inicioSesion.html';
-            //event.target.submit();
-        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar el curso');
     });
+});
 
 /*
 function enviarPhpNewCurso(datos){

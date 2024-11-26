@@ -1,11 +1,11 @@
-document.getElementById('addComentBtn').addEventListener('click', function() {
+/* document.getElementById('addComentBtn').addEventListener('click', function() {
     document.getElementById('formCategoria').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
-  });
+  });*/
 
   // Opcional: ocultar el formulario y la superposición al hacer clic en la superposición
   document.getElementById('overlay').addEventListener('click', function() {
-    document.getElementById('formCategoria').style.display = 'none';
+    document.getElementById('congratsScreen').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
   });
 

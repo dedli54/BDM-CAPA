@@ -142,7 +142,10 @@ if (!isset($_SESSION['user_id'])) {
 
         
         <div class="card-body"> <!--  Datos curso Ojo, se cambió el ID -->
-            <form id="dynamicForm"> 
+            <form id="dynamicForm" enctype="multipart/form-data"> 
+                <!-- Add hidden input for course ID -->
+                <input type="hidden" name="curso_id" value="<?php echo htmlspecialchars($curso_id); ?>">
+                <!-- Rest of your form fields remain the same -->
                 <div class="row">
                     <!-- Columna 1 -->
                     <div class="col">
@@ -239,7 +242,7 @@ if (!isset($_SESSION['user_id'])) {
                     <!-- Campos dinámicos serán insertados aquí -->
                 </div>
                 <div class="text-center mt-3">
-                    <button type="" class="btn btn-dark">Guardar</button> <!--submit, lo quité para no mandar el POST**-->
+                    <button type="submit" class="btn btn-dark">Guardar cambios</button>
                 </div>
             </form>
         </div>

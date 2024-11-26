@@ -42,6 +42,15 @@ try {
                           ORDER BY numeroNivel");
     $stmt->execute([$curso_id]);
     $niveles = $stmt->fetchAll();
+
+    if ($curso['foto']) {
+        $fotoBase64 = base64_encode($curso['foto']);
+        $fotoSrc = "data:image/jpeg;base64," . $fotoBase64;
+    } else {
+        // Imagen predeterminada
+        $fotoSrc = "IMG/sql.png";
+    }
+
 } catch (Exception $e) {
     die("Error: " . $e->getMessage());
 }
@@ -131,11 +140,29 @@ try {
     <hr class="opZero">
 
     <!-- Course header -->
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <h2 class="titulos"><?= htmlspecialchars($curso['titulo']) ?></h2>
-                <p class="subtitulos-categoria">Por: <?= htmlspecialchars($curso['autor']) ?> | <?= htmlspecialchars($curso['categoria']) ?></p>
+    <div class="container mt-5 "  >
+        <div class="card" > 
+            
+            <div class="card-body">
+
+                <div class="row allign-items-center">
+                    <div class="col-12 col-md-4">
+                            <img id="imgPerfil" class="rounded-2 img-curso" alt="Foto de perfil" src="<?php echo $fotoSrc; ?>">
+
+                    </div>
+                    <div class="col-11 col-md-8"> 
+
+                        <h2 class="titulos"><?= htmlspecialchars($curso['titulo']) ?></h2>
+                        <h6 class="subtitulos-categoria">Categoria: <?= htmlspecialchars($curso['categoria']) ?></h6>
+                        <p class="fs-5 textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
+                        <p class="fs-5 textos">Instructor: <?= htmlspecialchars($curso['autor']) ?></p>
+                        
+
+
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>
