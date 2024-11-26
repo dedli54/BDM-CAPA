@@ -88,10 +88,14 @@
     $curso_id = $_GET['id'] ?? 0;
     $user_id = $_SESSION['user_id'] ?? 0;
     
-    $stmt = $pdo->prepare("SELECT c.titulo, u.nombre, u.apellidos, DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y') as fecha_actual 
-                          FROM curso c, usuario u 
-                          WHERE c.id = ? AND u.id = ?");
-    $stmt->execute([$curso_id, $user_id]);
+    $stmt = $pdo->prepare("SELECT c.titulo, u.nombre, u.apellidos, 
+                              i.nombre as instructor_nombre, i.apellidos as instructor_apellidos,
+                              DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y') as fecha_actual 
+                       FROM curso c
+                       JOIN usuario u ON u.id = ?
+                       JOIN usuario i ON i.id = c.id_maestro 
+                       WHERE c.id = ?");
+    $stmt->execute([$user_id, $curso_id]);
     $data = $stmt->fetch();
     ?>
 
@@ -111,7 +115,8 @@
         <div class="diploma-footer">
             Fecha de emisión: <?php echo htmlspecialchars($data['fecha_actual']); ?>
             <br><br>
-            
+            Instructor: <?php echo htmlspecialchars($data['instructor_nombre'] . ' ' . $data['instructor_apellidos']); ?>
+            <br><br>
         </div>
     </div>
 
