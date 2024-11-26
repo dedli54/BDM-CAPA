@@ -9,34 +9,25 @@
     document.getElementById('overlay').style.display = 'none';
   });
 
-  document.getElementById('formComentario').addEventListener('submit', async function(event) {
-
-
-    event.preventDefault(); 
-
-    /* ESTO USE PARA AGREGAR CATEGORIA
-
-    const form = document.getElementById('formCategoria1'); //convertir a HTMLFormElement
-
-    const formData = new FormData(form); 
-    try {
-        const response = await fetch('../Controllers/crear_categoria.php', {
-            method: 'POST',
-            body: formData,
-        });
-
+  document.getElementById('formComentario').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('../Controllers/crearComentario.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
         if (response.ok) {
-            const result = await response.text(); 
-            alert(result); 
-            document.getElementById('formCategoria').style.display = 'none'; --
-            document.getElementById('overlay').style.display = 'none';
-
+            alert('Comentario enviado exitosamente');
+            window.location.reload(); // Refresh page to show new comment
         } else {
-            alert('Error al procesar la solicitud.');
+            throw new Error('Error al enviar comentario');
         }
-    } catch (error) {
-        alert('Ocurrió un error: ' + error.message);
-    }*/
-
-
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al enviar el comentario');
+    });
   });

@@ -27,14 +27,34 @@ try {
 }
 
 try {
-    $conexion = new conexion();
-    $pdo = $conexion->conectar();
     
     // Get courses created by the professor (user)
     $stmt = $pdo->prepare("CALL sp_obtener_cursos(?, ?, ?)");
     $stmt->execute([0, 'profesor', $_SESSION['user_id']]);
     $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
+
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
+}
+
+try {
+    
+    // Obtener info del alumno (user)
+    $stmt = $pdo->prepare("select * from usuario where id = ?");
+    $userId = (int) $_SESSION['user_id'];
+    $stmt->execute([$userId]);
+    $usuario = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+
+    if ($usuario[0]['foto']) {
+        $fotoBase64 = base64_encode($usuario[0]['foto']);
+        $fotoSrc = "data:image/jpeg;base64," . $fotoBase64;
+    } else {
+        // Imagen predeterminada
+        $fotoSrc = "IMG/sql.png";
+    }
 
 } catch (Exception $e) {
     die("Error: " . $e->getMessage());
@@ -126,17 +146,16 @@ try {
             <div class="card-body">
 
                 <div class="row">
-                    <div class="col-3 d-flex justify-content-end">
-                            <img src="IMG/sql.png" alt="Imagen circular" class="img-fluid rounded-circle fotoPerfil" >
-
-                    </div>
+                <div class="col-3 d-flex justify-content-end">
+    <img src="<?php echo $fotoSrc; ?>" alt="Imagen circular" class="img-fluid rounded-circle fotoPerfil" style="max-width: 100%; height: auto;">
+</div>
                     <div class="col-8">
 
-                        <h3 class="titulos">Nombre</h3>
+                        <h3 class="titulos"><?= htmlspecialchars($usuario[0]['nombre']) ?> <?= htmlspecialchars($usuario[0]['apellidos']) ?></h3>
                         <h4 class="subtitulos alumno">  Rol: Alumno</h4>
                         <h4 class="subtitulos profesor">Rol: Profesor</h4>
                         <h4 class="subtitulos admin">   Rol: Admin</h4>
-                        <p class="textos-2">81-8080-8081     emeil@email.com</p>
+                        <p class="textos-2"><?= htmlspecialchars($usuario[0]['telefono']) ?> | <?= htmlspecialchars($usuario[0]['email']) ?></p>
 
 
                     </div>
@@ -161,10 +180,10 @@ try {
 
     <div class="container">
         <hr class="opZero">
-    <h2 class="titulos alumno">Cursos inscritos</h2><h2 class="titulos profesor">Mis cursos creados</h2><hr>
+    <h2 class="titulos profesor">Mis cursos creados</h2><hr class = "profesor">
     </div>
     
-    <div class="container cont-Cursos px-2">
+    <div class="container cont-Cursos px-2 profesor">
     <div class="row rowCursos gx-5">
     <?php if (!empty($cursos)): ?>
         <?php foreach ($cursos as $curso): ?>

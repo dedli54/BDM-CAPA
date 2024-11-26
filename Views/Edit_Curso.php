@@ -165,7 +165,7 @@ if (!isset($_SESSION['user_id'])) {
 
                         <div class="mb-3 ">
                             <label for="foto" class="form-label fs-5 subtitulos">Selecciona una imagen:</label>
-                            <input type="file" class="form-control rounded-5" id="foto" accept="image/jpeg, image/png">
+                            <input type="file" class="form-control rounded-5" id="foto" name="foto" accept="image/jpeg, image/png">
                         </div>
                         <div class="img-container-2 text-center">
 
@@ -217,36 +217,32 @@ if (!isset($_SESSION['user_id'])) {
 
                 
 
-
+<!--
 
             <div class=" text-center">
                 <h3 class="subtitulos">Niveles</h3>
             </div>
 
 
-            <!--  Niveles curso  -->    <hr>
+              Niveles curso     <hr>
             
                 <div class="mb-3">
                     <label for="numFields" class="form-label fs-5 subtitulos">Seleccione el total de niveles</label>
                     <select class="form-select" id="numFields" disabled>
                         <option value="0">Selecciona el número de campos</option>
                         
-                        <?php
-                        for ($i = 3; $i <= 10; $i++) {
-                            echo '<option value="' . $i . '" ' . ($curso['niveles'] == $i ? 'selected' : '') . '>' . $i . '</option>';
-                        }
-                        ?>
+                       
                     </select>
                 </div>
                 <div id="fieldsContainer">
-                    <!-- Campos dinámicos serán insertados aquí -->
+                    
                 </div>
-                <div class="text-center mt-3">
+                
+        </div>--> <div class="text-center mt-3">
                     <button type="submit" class="btn btn-dark">Guardar cambios</button>
                 </div>
             </form>
-        </div>
-    </div>
+            </div></div>
 </div>
 
 <main class="flex-grow-1 container">

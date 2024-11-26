@@ -348,52 +348,6 @@ try {
         </div>
     </footer>
 
-
-        <!--                FORMS OCULTO PARA AGREGAR COMENTARIO         
-            <button class="btn btn-lg btn-dark admin" id="buyCurso">Agregar comentario</button> -->
-
-        <div id="overlay" class="overlay"></div>
-        <div class="container card buyForms" id="formCategoria">
-            
-                        <form action="../Controllers/crearComentario.php" method="POST" id="formComentario"> 
-
-                            
-
-                            <div class="row d-flex justify-content-center">
-                                <div class="col-7">
-                                    <div class="mb-3">
-                                    <label for="Calificacion" class="form-label">Calificacion:</label>
-
-                                    <select id="Calificacion" name="Calificacion" class="form-select">
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                    </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                    <label for="Comentario" class="form-label">Comentario:</label>
-                                    <input type="text" class="form-control" id="Comentario" name="Comentario" placeholder="Comentarios sobre el curso" required>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-
-                            <div class="d-flex justify-content-end "> 
-                                <button type="submit" class="btn btn-lg btn-dark" id="buyCurso">Agregar</button> <!--No importa mucho el ID porque se manda como SUBMIT-->
-                              </div>
-
-                              
-
-                        </form>
-                    
-        </div>    
-<!---->
-    <script src="JS/addComent.js"></script>
     
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
 

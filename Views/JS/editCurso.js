@@ -14,7 +14,7 @@
 });
  */
 //Mostrar Inputs de niveles
-
+/* 
 document.addEventListener('DOMContentLoaded', function() {
     const numFieldsSelect = document.getElementById('numFields');
     const fieldsContainer = document.getElementById('fieldsContainer');
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Ejecuta la misma lógica al cargar la página para manejar el valor por defecto
     numFieldsSelect.dispatchEvent(new Event('change'));
-});
+});*/
 
 
 

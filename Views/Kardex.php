@@ -186,29 +186,30 @@ if ($pdo) {
                     <th scope="col">Categoria</th>
                     <th scope="col">Estatus de curso</th>
                     <th scope="col">Fecha de inscripcion</th>
-                    <th scope="col">Ultima fecha</th>
-                    <th scope="col">Niveles tomados</th>
                     <th scope="col">Niveles totales</th>
-                    <th scope="col">Diploma</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php
-                    
-                    $pdo = $conexion->conectar();
-                    
-
                     try {
-                      
-                      $p_id_alumno = (int)$_SESSION['user_id']; 
-                        $p_fecha_inicio = !empty($_POST['fecha_inicio']) ? $_POST['fecha_inicio'] : null;
-                        $p_fecha_fin = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
-                        $p_categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
-                        $p_activo = isset($_POST['activo']) ? 1 : null;
-                        $p_completado = isset($_POST['completado']) ? 1 : null;
+                        $pdo = $conexion->conectar();
+                        $p_id_alumno = (int)$_SESSION['user_id']; 
+                        
+                        // mostar todos los cursos si no se ha enviado el formulario
+                        if (!$_POST) {
+                            $stmt = $pdo->prepare("CALL sp_kardex_filtros(?, NULL, NULL, NULL, NULL, NULL)");
+                            $stmt->execute([$p_id_alumno]);
+                        } else {
+                            // aplicar filtros
+                            $p_fecha_inicio = !empty($_POST['fecha_inicio']) ? $_POST['fecha_inicio'] : null;
+                            $p_fecha_fin = !empty($_POST['fecha_fin']) ? $_POST['fecha_fin'] : null;
+                            $p_categoria_id = !empty($_POST['categoria_id']) && $_POST['categoria_id'] !== 'Todas' ? $_POST['categoria_id'] : null;
+                            $p_activo = isset($_POST['activo']) ? 1 : null;
+                            $p_completado = isset($_POST['completado']) ? 1 : null;
 
-                        $stmt = $pdo->prepare("CALL sp_kardex_filtros(?, ?, ?, ?, ?, ?)");
-                        $stmt->execute([$p_id_alumno, $p_fecha_inicio, $p_fecha_fin, $p_categoria_id, $p_activo, $p_completado]);
+                            $stmt = $pdo->prepare("CALL sp_kardex_filtros(?, ?, ?, ?, ?, ?)");
+                            $stmt->execute([$p_id_alumno, $p_fecha_inicio, $p_fecha_fin, $p_categoria_id, $p_activo, $p_completado]);
+                        }
 
                         if ($stmt->rowCount() > 0) {
                             $num = 1;
@@ -219,33 +220,21 @@ if ($pdo) {
                                 echo "<td>" . htmlspecialchars($row['Categoria']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['Curso_status']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['Fecha_de_inscripcion']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['Ultima_fecha']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['Niveles_tomados']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['Niveles_totales']) . "</td>";
-                                if ($row['Curso_terminado']) {
-                                    echo "<td><a href='diploma.php?id=" . $row['id_alumno'] . "' target='_blank'>Ver Diploma</a></td>";
-                                } else {
-                                    echo "<td>No disponible</td>";
-                                }
+                                
                                 echo "</tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='9'>No hay registros que coincidan con los filtros aplicados</td></tr>";
+                            echo "<tr><td colspan='9' class='text-center'>No hay cursos registrados</td></tr>";
                         }
 
-                        $stmt->closeCursor();  // Cerrar el cursor
+                        $stmt->closeCursor();
                         $pdo = null;
 
                     } catch (PDOException $e) {
                         echo "<tr><td colspan='9'>Error: " . $e->getMessage() . "</td></tr>";
                     }
-
-
-
-
                   ?>
-
-
                 </tbody>
             </table></div>
 
