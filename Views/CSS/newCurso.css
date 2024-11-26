@@ -4,3 +4,9 @@
     margin-top: 15px;
     display: none; 
 }
+
+.img-preview-edit {
+    max-width: 80%;
+    max-height: 300px; 
+    margin-top: 15px;
+}

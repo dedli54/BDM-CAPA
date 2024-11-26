@@ -43,7 +43,7 @@ document.getElementById('newUsuario').addEventListener('submit', function(event)
 
     const fecha = document.getElementById('fecha_nacimiento').value;
     const genero = document.getElementById('genero').value;
-    const cuenta = document.getElementById('tipo_de_cuenta').value;
+    const cuenta = '3';
 
     let errores = [];
 
@@ -57,10 +57,7 @@ document.getElementById('newUsuario').addEventListener('submit', function(event)
         errores.push("Debes seleccionar un género válido");
     }
 
-    const cuentaCb = ['1', '2'];
-    if (!cuentaCb.includes(cuenta)) {
-        errores.push("Debes seleccionar un tipo de cuenta valido");
-    }
+    
 
     if (fecha) {
         const fechaSeleccionada = new Date(fecha);
@@ -134,5 +131,52 @@ document.getElementById('newUsuario').addEventListener('submit', function(event)
         //alert("Usuario creado con exito :)");
         ////window.location.href = 'inicioSesion.html';
         //event.target.submit();
+
+        
+        enviarPhpNewUser({ nombre, apellido, email, pw, telefono, fecha, genero, cuenta, img });
     }
 });
+
+
+function enviarPhpNewUser(datos) {
+    const formData = new FormData();
+    
+    // Agrega los datos al FormData
+    formData.append('nombre_usuario', datos.nombre); // Asegúrate de que el nombre del campo coincida con el que espera el PHP
+    formData.append('nombre', datos.nombre);
+    formData.append('apellidos', datos.apellido);
+    formData.append('email', datos.email);
+    formData.append('pw', datos.pw);
+    formData.append('telefono', datos.telefono);
+    formData.append('fecha', datos.fecha);
+    formData.append('genero', datos.genero);
+    formData.append('cuenta', datos.cuenta);
+    
+    // Si hay imagen, agrégala
+    if (datos.img) {
+        formData.append('foto', datos.img);
+    }
+
+    // Enviar la solicitud al PHP
+    fetch('../Controllers/register.php', { // Ajusta la ruta según tu estructura de carpetas
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text()) // o .json() si esperas JSON
+    .then(data => {
+
+        console.log(data);
+        
+        if (data.includes("Usuario registrado correctamente")) {
+            alert("Usuario registrado :)");
+
+
+            window.location.href = 'perfil.php'; // Ajusta la ruta si es necesario
+        } else {
+            alert("Error al registrar: " + data);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}

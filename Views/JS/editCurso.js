@@ -1,7 +1,7 @@
 
 
 //Funcion para mostrar la imagen
-document.getElementById('foto').addEventListener('change', function(event) {
+/*document.getElementById('foto').addEventListener('change', function(event) {
     const file = event.target.files[0]; 
 
     if (file) {
@@ -14,17 +14,20 @@ document.getElementById('foto').addEventListener('change', function(event) {
         reader.readAsDataURL(file); // Lee el archivo como una URL de datos
     }
 });
-
+ */
 //Mostrar Inputs de niveles
 
 document.addEventListener('DOMContentLoaded', function() {
-        const numFieldsSelect = document.getElementById('numFields');
-        const fieldsContainer = document.getElementById('fieldsContainer');
+    const numFieldsSelect = document.getElementById('numFields');
+    const fieldsContainer = document.getElementById('fieldsContainer');
 
-        numFieldsSelect.addEventListener('change', function() {
-            const numFields = parseInt(this.value);
-            fieldsContainer.innerHTML = ''; // Limpia los campos actuales
+    // Asegúrate de que la función se ejecute cuando cambie el valor
+    numFieldsSelect.addEventListener('change', function() {
+        const numFields = parseInt(this.value); // Número de campos seleccionados
+        fieldsContainer.innerHTML = ''; // Limpia los campos actuales
 
+        // Si se selecciona un número válido (mayor que 0), muestra los campos
+        if (numFields > 0) {
             for (let i = 1; i <= numFields; i++) {
                 const row = document.createElement('div');
                 row.classList.add('row', 'mb-3', 'form-field');
@@ -32,36 +35,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.innerHTML = `
                 <hr style="opacity:15%">
                 <div class="col-md-12">
-                        <label class="form-label fs-3 " >Nivel ${i}</label>
-                    </div>
+                    <label class="form-label fs-3">Nivel ${i}</label>
+                </div>
 
-                    <div class="col-md-6">
-                        <label for="text${i}" class="form-label fs-4">Texto ${i}</label>
-                        <textarea class="form-control textarea-md" id="text${i}" placeholder="Ingresa texto ${i}"></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="file${i}" class="form-label fs-4">Archivo ${i}</label>
-                        <input type="file" class="form-control" id="file${i}" accept="video/mp4,video/*">
-                    </div>
+                <div class="col-md-6">
+                    <label for="text${i}" class="form-label fs-4">Texto ${i}</label>
+                    <textarea class="form-control textarea-md" id="text${i}" placeholder="Ingresa texto ${i}"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="file${i}" class="form-label fs-4">Archivo ${i}</label>
+                    <input type="file" class="form-control" id="file${i}" accept="video/mp4,video/*">
+                </div>
                 `;
 
                 fieldsContainer.appendChild(row);
             }
+        }
 
-            // Mostrar los campos seleccionados
-            document.querySelectorAll('.form-field').forEach((field, index) => {
-                if (index < numFields) {
-                    field.style.display = 'flex';
-                } else {
-                    field.style.display = 'none';
-                }
-            });
+        // Mostrar u ocultar los campos según el número seleccionado
+        document.querySelectorAll('.form-field').forEach((field, index) => {
+            if (index < numFields) {
+                field.style.display = 'flex'; // Mostrar campos dentro del límite
+            } else {
+                field.style.display = 'none'; // Ocultar los campos fuera del límite
+            }
         });
     });
+
+    // Ejecuta la misma lógica al cargar la página para manejar el valor por defecto
+    numFieldsSelect.dispatchEvent(new Event('change'));
+});
+
+
+
 
 
 //Ocultar precios dependiendo del check box 
 
+/* 
 document.getElementById('cGratis').addEventListener('change', function(event){
     const elementosCosto = document.getElementsByClassName('costo');
     
@@ -79,7 +90,7 @@ document.getElementById('cGratis').addEventListener('change', function(event){
 
 
 
-});
+});*/
 
 //Precio regex
 document.getElementById('cTotal').addEventListener('input', function(event) {
@@ -94,6 +105,7 @@ document.getElementById('cTotal').addEventListener('input', function(event) {
 });
 
 //Precio regex 2
+/* 
 document.getElementById('cNivel').addEventListener('input', function(event) {
     const input = event.target.value;
 
@@ -103,7 +115,7 @@ document.getElementById('cNivel').addEventListener('input', function(event) {
         event.target.value = input.slice(0, -1); 
     } else {
     }
-});
+});*/
 
 
 
@@ -218,7 +230,7 @@ document.getElementById('dynamicForm').addEventListener('submit', function(event
             const csCategoria = parseInt(categoria);
             const tot = parseFloat(cTotal);
 
-            enviarPhpNewCurso({cName,cDesc,img,tot,idProfe,csCategoria});
+            //enviarPhpNewCurso({cName,cDesc,img,tot,idProfe,csCategoria});
 
             /*
             

@@ -1,6 +1,6 @@
 <?php
 session_start(); // Asegúrate de iniciar la sesión al principio del archivo PHP
-$textBuscar = isset($_SESSION['textBuscar']) ? htmlspecialchars($_SESSION['textBuscar']) : ''; // Verifica si 'textBuscar' está definido
+$textBuscar = isset($_SESSION['textBuscar']) ? htmlspecialchars($_SESSION['textBuscar']) : ''; // No recuerdo si se usa o solo en Busqueda, ahorita
 
 if (!isset($_SESSION['user_id'])) {
     // Muestra un alert antes de redirigir
@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
           </script>";
     exit();
 }
+// sp_consultar_usuario (INT user_id) llenar foto nombre y así
 
 
 ?>
@@ -189,23 +190,22 @@ if (!isset($_SESSION['user_id'])) {
 
         <!--                FORMS OCULTO PARA AGREGAR CATEGORIA         -->
         <div id="overlay" class="overlay"></div>
-        <div class="container card buyForms" id="formBuy">
+        <div class="container card buyForms" id="formCategoria">
             
-
-
-
-
-
-
-                        <form>
+                        <form action="../Controllers/crear_categoria.php" method="POST" id="formCategoria1"> 
 
                             
 
                             <div class="row d-flex justify-content-center">
                                 <div class="col-5">
                                     <div class="mb-3">
-                                    <label for="vencimiento" class="form-label">Nombre de categoria (no repetir)</label>
-                                    <input type="text" class="form-control" id="vencimiento" placeholder="Categoria New" required>
+                                    <label for="nameCat" class="form-label">Nombre de categoria (no repetir):</label>
+                                    <input type="text" class="form-control" id="nameCat" name="nameCat" placeholder="Categoria New" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                    <label for="definicion" class="form-label">Definicion:</label>
+                                    <input type="text" class="form-control" id="definicion" name="definicion" placeholder="Definicion" required>
                                     </div>
                                 </div>
 
@@ -239,6 +239,6 @@ if (!isset($_SESSION['user_id'])) {
     </footer>
 
     
-<script src="JS/comprarCurso2.js"></script>  <!-- Mostrar Ventana flotante  formBuy  -->
+<script src="JS/addCategoria.js"></script>  <!-- Mostrar Ventana flotante  formCategoria  -->
 <script src="JS/perfil.js"></script> <!-- Esconde las acciones de perfil dependiendo del tipo de usuario --> 
 </body>

@@ -9,6 +9,60 @@ if (!isset($_SESSION['user_id'])) {
           </script>";
     exit();
 }
+
+
+
+    include '../conexion.php';
+            $conexion = new conexion();
+            $pdo = $conexion->conectar();
+            
+    if ($pdo) {
+
+        $p_categoria_id = 0; 
+    
+        $stmt = $pdo->prepare("CALL sp_Categorias(?)");
+        $stmt->bindParam(1, $p_categoria_id, PDO::PARAM_INT);
+    
+        $stmt->execute();
+    
+        $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Cerrar la conexión
+        $stmt->closeCursor();
+        
+    } else {
+        echo "Error de conexión.";
+    }
+
+    
+    $curso_id = $_GET['id'] ?? 1;
+
+    try {
+
+    // Llamar al procedimiento almacenado
+    $query = $pdo->prepare("CALL sp_DatosEditCurso(:id_curso)");
+    $query->bindParam(':id_curso', $curso_id, PDO::PARAM_INT);
+    $query->execute();
+
+    // Obtener el resultado
+    $curso = $query->fetch(PDO::FETCH_ASSOC);
+
+    $foto_base64 = null;
+    if (!empty($curso['foto'])) {
+        $foto_base64 = base64_encode($curso['foto']);
+    }
+
+    $id_categoria_seleccionada = $curso['id_categoria'] ?? null;
+
+    $query->closeCursor(); // Necesario al usar procedimientos almacenados con PDO
+
+    $pdo = null;
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+    exit;
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -94,11 +148,14 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="col">
                         <div class="mb-3">
                             <label for="cName" class="form-label fs-5 subtitulos">Titulo:</label>
-                            <input type="text" class="form-control rounded-5" id="cName" placeholder="Ingresa titulo del curso">
+                            <input type="text" class="form-control rounded-5" id="cName" placeholder="Ingresa titulo del curso"
+                            value="<?php echo htmlspecialchars($curso['titulo'], ENT_QUOTES); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="cDesc" class="form-label fs-5 subtitulos">Descripcion:</label>
-                            <textarea class="form-control textarea-md" id="cDesc" placeholder="Ingresa descripcion"></textarea>
+                            <textarea class="form-control textarea-md" id="cDesc" placeholder="Ingresa descripcion"><?php echo htmlspecialchars($curso['descripcion'], ENT_QUOTES); ?></textarea>
+
+                            
                         </div>
                         
 
@@ -107,8 +164,10 @@ if (!isset($_SESSION['user_id'])) {
                             <label for="foto" class="form-label fs-5 subtitulos">Selecciona una imagen:</label>
                             <input type="file" class="form-control rounded-5" id="foto" accept="image/jpeg, image/png">
                         </div>
-                        <div class="img-container d-flex justify-content-center">
-                            <img id="preview" class="img-preview rounded-5" alt="Foto de perfil seleccionada">
+                        <div class="img-container-2 text-center">
+
+                        <img id="" class="img-preview-edit rounded-5" alt="Foto de perfil seleccionada"
+                        src="<?php echo !empty($foto_base64) ? 'data:image/jpeg;base64,' . $foto_base64 : 'IMG/sql.png'; ?>">
                         </div>
 
                         
@@ -117,40 +176,33 @@ if (!isset($_SESSION['user_id'])) {
 
                     <!-- Columna 2 -->
                     <div class="col">
-                        <div class="mb-3"> <!--   TO DO FRONT: Java que muestre u oculte informacion dependiendo     -->
-                            <input type="checkbox" class="form-check-input" id="cGratis">
-                            <label for="cTotal" class="form-label fs-5 subtitulos">Curso gratuito</label>
-                        </div>
+                        
                         
                         <div class="mb-3 costo">
                             <label for="cTotal" class="form-label fs-5 subtitulos">Costo total:</label>
-                            <input type="number" class="form-control rounded-5" id="cTotal" placeholder="Costo por todo el curso">
+                            <input type="number" class="form-control rounded-5" id="cTotal" placeholder="Costo por todo el curso"
+                            value="<?php echo htmlspecialchars($curso['precio'], ENT_QUOTES); ?>">
                         </div>
-                        <div class="mb-3 costo">
-                            <label for="cNivel" class="form-label fs-5 subtitulos">Costo por nivel:</label>
-                            <input type="number" class="form-control rounded-5" id="cNivel" placeholder="Costo por todo el curso">
-                        </div>
+                        
                         <div class="mb-3">
                             <label for="cCategoria" class="form-label fs-5 subtitulos">Categoria:</label>
-                                <select class="form-select rounded-5" id="cCategoria">
+                            <select class="form-select rounded-5" id="cCategoria">
                                     <option selected>Categoria</option>
-                                    <option value="1">Matematicas</option>
-                                    <option value="2">Arte</option>
-                                    <option value="3">Computo</option>
+                                    
+                                    <?php
+                                        foreach ($categorias as $categoria) {
+                                            echo '<option value="' . $categoria['id'] . '"'; // ID en el valor
+
+                                            if ($categoria['id'] == $id_categoria_seleccionada) {
+                                                echo ' selected'; // Marca la categoría como seleccionada
+                                            }
+                                            echo '>' . $categoria['nombre'] . '</option>'; // Nombre de la categoria se muestra 
+                                        }
+                                        ?>
+
                                 </select>
                         </div>
-                        <div class="mb-3 costo">
-                            <label for="freeLvl" class="form-label fs-5 subtitulos">Niveles gratuitos:</label>
-                                <select class="form-select rounded-5" id="freeLvl">
-                                    <option selected>0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                </select>
-                        </div>
+                        
 
                         
 
@@ -173,24 +225,21 @@ if (!isset($_SESSION['user_id'])) {
             
                 <div class="mb-3">
                     <label for="numFields" class="form-label fs-5 subtitulos">Seleccione el total de niveles</label>
-                    <select class="form-select" id="numFields">
+                    <select class="form-select" id="numFields" disabled>
                         <option value="0">Selecciona el número de campos</option>
                         
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
+                        <?php
+                        for ($i = 3; $i <= 10; $i++) {
+                            echo '<option value="' . $i . '" ' . ($curso['niveles'] == $i ? 'selected' : '') . '>' . $i . '</option>';
+                        }
+                        ?>
                     </select>
                 </div>
                 <div id="fieldsContainer">
                     <!-- Campos dinámicos serán insertados aquí -->
                 </div>
                 <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-dark">Guardar</button>
+                    <button type="" class="btn btn-dark">Guardar</button> <!--submit, lo quité para no mandar el POST**-->
                 </div>
             </form>
         </div>
@@ -214,7 +263,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
 
-<script src="JS/addCurso.js"></script>
+<script src="JS/editCurso.js"></script>
 
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
 </body>
