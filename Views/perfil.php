@@ -1,5 +1,6 @@
 <?php
-session_start(); // Asegúrate de iniciar la sesión al principio del archivo PHP
+session_start(); // Inicia la sesión
+
 $textBuscar = isset($_SESSION['textBuscar']) ? htmlspecialchars($_SESSION['textBuscar']) : ''; // No recuerdo si se usa o solo en Busqueda, ahorita
 
 if (!isset($_SESSION['user_id'])) {
@@ -10,8 +11,34 @@ if (!isset($_SESSION['user_id'])) {
           </script>";
     exit();
 }
-// sp_consultar_usuario (INT user_id) llenar foto nombre y así
 
+require '../conexion.php';
+
+// test de conexcion 
+try {
+    $conexion = new conexion();
+    $pdo = $conexion->conectar();
+    
+    if (!$pdo) {
+        throw new Exception('Could not connect to database');
+    }
+} catch (Exception $e) {
+    die("Connection error: " . $e->getMessage());
+}
+
+try {
+    $conexion = new conexion();
+    $pdo = $conexion->conectar();
+    
+    // Get courses created by the professor (user)
+    $stmt = $pdo->prepare("CALL sp_resumen_curso(?, NULL, NULL, 0, NULL)");
+    $stmt->execute([$_SESSION['user_id']]);
+    $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
+}
 
 ?>
 
@@ -137,21 +164,40 @@ if (!isset($_SESSION['user_id'])) {
     <h2 class="titulos alumno">Cursos inscritos</h2><h2 class="titulos profesor">Mis cursos creados</h2><hr>
     </div>
     
-    <div class="container cont-Cursos px-2 ">
-        <div class="row rowCursos gx-5" >
-    
-        <p class="subtitulos-categoria">*Mostrar cursos inscritos o creados</p>
-        
-            <!--Aqui agregar cada curso-->
-    
-            
-             
-    
-        </div>
-    
-            
-    
-        </div>
+    <div class="container cont-Cursos px-2">
+    <div class="row rowCursos gx-5">
+        <?php if (!empty($cursos)): ?>
+            <?php foreach ($cursos as $curso): ?>
+                <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
+                    <div class="row no-gutters">
+                        <div class="col-5">
+                            <div class="card-body">
+                                <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['Nombre']) ?></h4>
+                                <p class="subtitulos-categoria small"><?= htmlspecialchars($curso['Categoria']) ?></p>
+                                <p class="textos">Alumnos inscritos: <?= htmlspecialchars($curso['Alumnos_inscritos']) ?></p>
+                                <p class="textos">Ingresos: $<?= number_format($curso['Ingresos_totales'], 2) ?></p>
+                                <a href="Edit_Curso.php?id=<?= $curso['ID_Curso'] ?>" class="btn btn-primary btn-sm">Editar curso</a>
+                            </div>
+                        </div>
+                        <div class="col-7">
+                            <?php if (!empty($curso['foto'])): ?>
+                                <img class="img-fluid h-100 imgCard" 
+                                     src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
+                                     alt="Imagen del curso">
+                            <?php else: ?>
+                                <img class="img-fluid h-100 imgCard" 
+                                     src="IMG/sql.png" 
+                                     alt="Imagen predeterminada">
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p class="text-center textos">No has creado ningún curso todavía.</p>
+        <?php endif; ?>
+    </div>
+</div>
 
         <div class="container">
             <hr class="opZero">
