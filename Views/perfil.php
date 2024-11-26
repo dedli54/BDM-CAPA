@@ -31,8 +31,8 @@ try {
     $pdo = $conexion->conectar();
     
     // Get courses created by the professor (user)
-    $stmt = $pdo->prepare("CALL sp_resumen_curso(?, NULL, NULL, 0, NULL)");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt = $pdo->prepare("CALL sp_obtener_cursos(?, ?, ?)");
+    $stmt->execute([0, 'profesor', $_SESSION['user_id']]);
     $cursos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
 
@@ -166,37 +166,34 @@ try {
     
     <div class="container cont-Cursos px-2">
     <div class="row rowCursos gx-5">
-        <?php if (!empty($cursos)): ?>
-            <?php foreach ($cursos as $curso): ?>
-                <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
-                    <div class="row no-gutters">
-                        <div class="col-5">
-                            <div class="card-body">
-                                <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['Nombre']) ?></h4>
-                                <p class="subtitulos-categoria small"><?= htmlspecialchars($curso['Categoria']) ?></p>
-                                <p class="textos">Alumnos inscritos: <?= htmlspecialchars($curso['Alumnos_inscritos']) ?></p>
-                                <p class="textos">Ingresos: $<?= number_format($curso['Ingresos_totales'], 2) ?></p>
-                                <a href="Edit_Curso.php?id=<?= $curso['ID_Curso'] ?>" class="btn btn-primary btn-sm">Editar curso</a>
+    <?php if (!empty($cursos)): ?>
+        <?php foreach ($cursos as $curso): ?>
+            <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
+                <div class="row no-gutters">
+                    <div class="col-5">
+                        <div class="card-body">
+                            <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['titulo']) ?></h4>
+                            <p class="subtitulos-categoria small"><?= htmlspecialchars($curso['categoria']) ?></p>
+                            <p class="textos">Alumnos inscritos: <?= htmlspecialchars($curso['Alumnos_inscritos']) ?></p>
+                            <p class="textos">Ingresos: $<?= number_format($curso['Ingresos_totales'], 2) ?></p>
+                            <div class="btn-group">
+                                <a href="Edit_Curso.php?id=<?= $curso['id'] ?>" class="btn btn-primary btn-sm">Editar curso</a>
+                                <button onclick="deleteCourse(<?= $curso['id'] ?>)" class="btn btn-danger btn-sm">Eliminar curso</button>
                             </div>
                         </div>
-                        <div class="col-7">
-                            <?php if (!empty($curso['foto'])): ?>
-                                <img class="img-fluid h-100 imgCard" 
-                                     src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
-                                     alt="Imagen del curso">
-                            <?php else: ?>
-                                <img class="img-fluid h-100 imgCard" 
-                                     src="IMG/sql.png" 
-                                     alt="Imagen predeterminada">
-                            <?php endif; ?>
-                        </div>
+                    </div>
+                    <div class="col-7">
+                        <img class="img-fluid h-100 imgCard" 
+                             src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
+                             alt="<?= htmlspecialchars($curso['titulo']) ?>">
                     </div>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p class="text-center textos">No has creado ningún curso todavía.</p>
-        <?php endif; ?>
-    </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p class="text-center textos">No has creado ningún curso todavía.</p>
+    <?php endif; ?>
+</div>
 </div>
 
         <div class="container">

@@ -1211,28 +1211,56 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE sp_obtener_cursos_comprados(
-    IN p_id_alumno INT
+CREATE PROCEDURE sp_obtener_cursos(
+    IN p_categoria_id INT,
+    IN p_tipo VARCHAR(20),
+    IN p_user_id INT
 )
 BEGIN
-    SELECT 
-        c.id,
-        c.titulo,
-        c.descripcion,
-        c.precio,
-        c.foto,
-        cat.nombre as categoria,
-        CONCAT(u.nombre, ' ', u.apellidos) as autor
-    FROM curso c
-    JOIN categoria cat ON c.id_categoria = cat.id 
-    JOIN usuario u ON c.id_maestro = u.id
-    JOIN inscripcion i ON c.id = i.id_curso
-    WHERE i.id_alumno = p_id_alumno
-    AND c.status = 1;
+    CASE p_tipo
+        WHEN 'recientes' THEN
+            -- Get recently added courses excluding purchased ones
+            SELECT 
+                c.id,
+                c.titulo,
+                c.descripcion,
+                c.precio,
+                c.foto,
+                cat.nombre as categoria,
+                CONCAT(u.nombre, ' ', u.apellidos) as autor
+            FROM curso c
+            JOIN categoria cat ON c.id_categoria = cat.id 
+            JOIN usuario u ON c.id_maestro = u.id
+            WHERE (c.id_categoria = p_categoria_id OR p_categoria_id = 0)
+            AND c.status = 1
+            ORDER BY c.fe_Creacion DESC
+            LIMIT 6;
+            
+        WHEN 'profesor' THEN
+            -- Get courses created by the professor
+            SELECT 
+                c.id,
+                c.titulo,
+                c.descripcion,
+                c.precio,
+                c.foto,
+                cat.nombre as categoria,
+                COUNT(DISTINCT i.id_alumno) as Alumnos_inscritos,
+                IFNULL(SUM(t.monto), 0) as Ingresos_totales
+            FROM curso c
+            JOIN categoria cat ON c.id_categoria = cat.id
+            LEFT JOIN inscripcion i ON c.id = i.id_curso
+            LEFT JOIN transaccion t ON c.id = t.id_curso AND t.estatus = 1
+            WHERE c.id_maestro = p_user_id
+            AND c.status = 1
+            GROUP BY c.id, c.titulo, c.descripcion, c.precio, c.foto, cat.nombre;
+            
+        ELSE
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Tipo de consulta no válido';
+    END CASE;
 END$$
 DELIMITER ;
-
-DELIMITER $$
 
 CREATE PROCEDURE sp_obtener_cursos(
     IN p_categoria_id INT,
@@ -1326,4 +1354,22 @@ BEGIN
     AND pc.id_curso = p_id_curso
     AND pc.nivel_actual >= (SELECT COUNT(*) FROM nivelesCurso WHERE id_curso = p_id_curso);
 END //
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_soft_delete_curso(
+    IN p_id_curso INT,
+    IN p_id_profesor INT
+)
+BEGIN
+    -- Verify the course exists and belongs to the professor
+    IF EXISTS (SELECT 1 FROM curso WHERE id = p_id_curso AND id_maestro = p_id_profesor) THEN
+        UPDATE curso 
+        SET status = 0 
+        WHERE id = p_id_curso AND id_maestro = p_id_profesor;
+        SELECT TRUE as success, 'Curso desactivado exitosamente' as message;
+    ELSE
+        SELECT FALSE as success, 'No se encontró el curso o no tienes permiso para eliminarlo' as message;
+    END IF;
+END$$
 DELIMITER ;
