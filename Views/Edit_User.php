@@ -10,6 +10,33 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
+require '../conexion.php';
+
+try {
+    $conexion = new conexion();
+    $pdo = $conexion->conectar();
+    
+    // Obtener info del alumno (user)
+    $stmt = $pdo->prepare("select * from usuario where id = ?");
+    $userId = (int) $_SESSION['user_id'];
+    $stmt->execute([$userId]);
+    $usuario = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+
+    if ($usuario[0]['foto']) {
+        $fotoBase64 = base64_encode($usuario[0]['foto']);
+        $fotoSrc = "data:image/jpeg;base64," . $fotoBase64;
+    } else {
+        // Imagen predeterminada
+        $fotoSrc = "IMG/sql.png";
+    }
+
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
+}
+
 ?>
 
 
@@ -18,7 +45,7 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear usuario</title>
+    <title>Editar mi usuario</title>
     <link rel="stylesheet" href="CSS/bootstrapCSS/bootstrap.min.css">
 
 
@@ -35,66 +62,50 @@ if (!isset($_SESSION['user_id'])) {
         </div>
 
 <!--Navbar-->
-<div class="container card">
+    <div class="container card">
 
     <nav class="navbar navbar-expand-lg navbar-light ">
-      <div class="container-fluid">
-          <!-- Logo de la barra de navegación -->
-          <!-- <a class="navbar-brand" href="#">A&J</a> -->
-          
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-          </button>
-          
-          <!-- Contenido oculto en dispositivos pequeños -->
-          <div class="collapse navbar-collapse" id="navbarOpciones">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                  <li class="nav-item border-end">
-                      <a class="nav-link active textos-2" aria-current="page" href="landPage.php">Principal</a>
-                  </li>
+    <div class="container-fluid">
+        
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        
+        <div class="collapse navbar-collapse" id="navbarOpciones">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item border-end">
+                    <a class="nav-link active textos-2" aria-current="page" href="landPage.php">Principal</a>
+                </li>
 
-                  <li class="nav-item border-end">
-                      <a class="nav-link active textos-2" aria-current="page" href="perfil.php">Mi perfil</a>
-                  </li>
+                <li class="nav-item border-end">
+                    <a class="nav-link active textos-2" aria-current="page" href="perfil.php">Mi perfil</a>
+                </li>
 
-                  <li class="nav-item border-end">
-                      <a class="nav-link active textos-2" aria-current="page" href="chat.html">Mis chats</a>
-                  </li>
+                <li class="nav-item border-end">
+                    <a class="nav-link active textos-2" aria-current="page" href="chat.php">Mis chats</a>
+                </li>
 
-                  
-                  <!-- Desplegable de opciones -->
-                  <li class="nav-item dropdown border-end">
-                      <a class="nav-link dropdown-toggle textos-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Categorias
-                      </a>
-                      <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <li><a class="dropdown-item textos-2" href="Busqueda.html">Arte</a></li>
-                          <li><a class="dropdown-item textos-2" href="Busqueda.html">Matematicas</a></li>
-                          <li><a class="dropdown-item textos-2" href="Busqueda.html">Programacion</a></li>
-                           <!--li><hr class="dropdown-divider"></li> 
-                          <li><a class="dropdown-item textos-2" href="#">Cerrar sesion</a></li--> <!--style letras rojas-->
+                
+                
 
-                      </ul>
-                  </li>
+                <li class="nav-item">
+                    <a class="nav-link active textos-2" aria-current="page" href="../Controllers/logout.php">Cerrar sesion</a>
+                </li>
+            </ul>
 
-                  <li class="nav-item">
-                  <a class="nav-link active textos-2" aria-current="page" href="../Controllers/logout.php">Cerrar sesion</a>
-                  </li>
-              </ul>
-  
-              <!-- Formulario de búsqueda ajustable -->
-              <form class="d-flex w-auto w-md-50 w-lg-50">
-                  <input class="form-control me-2 textos-2" type="search" placeholder="Buscar" aria-label="Buscar">
-                  <button class="btn btn-outline-dark textos-2" type="submit" formaction="Busqueda.html">Buscar</button>
-              </form>
-  
-          </div>
-      </div>
-  </nav>
-  
-</div>
+            <!-- Form de búsqueda  -->
+            <form class="d-flex w-auto w-md-50 w-lg-50" method="POST" action="../Controllers/guardarBusqueda.php">
+                <input class="form-control me-2 textos-2" type="search" name="textBuscar" placeholder="Buscar" aria-label="Buscar">
+                <button class="btn btn-outline-dark textos-2" type="submit">Buscar</button>
+            </form>
 
+        </div>
+    </div>
+    </nav>
 
+    </div>
 
 
 
@@ -110,12 +121,12 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="col-md-11  col-lg-6">
                         <div class="mb-3">
                             <label for="nombre" class="form-label fs-3 subtitulos">Nombre</label>
-                            <input type="text" class="form-control rounded-5" id="nombre" name="nombre" placeholder="Ingresa tu nombre">
+                            <input type="text" class="form-control rounded-5" id="nombre" name="nombre" placeholder="Ingresa tu nombre" value="<?= htmlspecialchars($usuario[0]['nombre']) ?>">
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label fs-3 subtitulos">Correo Electrónico</label>
-                            <input type="text" class="form-control rounded-5" id="email" name="email" placeholder="Ingresa tu correo">
+                            <input type="text" class="form-control rounded-5" id="email" name="email" placeholder="Ingresa tu correo" value="<?= htmlspecialchars($usuario[0]['email']) ?>">
                         </div>
 
                         <div class="mb-3">
@@ -144,16 +155,16 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="col-md-11  col-lg-6">
                         <div class="mb-3">
                             <label for="apellido" class="form-label fs-3 subtitulos">Apellido</label>
-                            <input type="text" class="form-control rounded-5" id="apellido" name="apellido" placeholder="Ingresa tu apellido">
+                            <input type="text" class="form-control rounded-5" id="apellido" name="apellido" placeholder="Ingresa tu apellido" value="<?= htmlspecialchars($usuario[0]['apellidos']) ?>">
                         </div>
                         <div class="mb-3">
                             <label for="telefono" class="form-label fs-3 subtitulos">Teléfono</label>
-                            <input type="number" class="form-control rounded-5 no-spin" id="telefono" name="telefono" placeholder="Ingresa tu teléfono" min="0" step="1">
+                            <input type="number" class="form-control rounded-5 no-spin" id="telefono" name="telefono" placeholder="Ingresa tu teléfono" min="0" step="1" value="<?= htmlspecialchars($usuario[0]['telefono']) ?>">
                         </div>
 
                         <div class="mb-3">
                             <label for="fecha" class="form-label fs-3 subtitulos">Fecha de nacimiento</label>
-                            <input type="date" class="form-control rounded-5" id="fecha" name="fecha">
+                            <input type="date" class="form-control rounded-5" id="fecha" name="fecha" value="<?= htmlspecialchars($usuario[0]['fecha_nacimiento']) ?>">
                         </div>
 
                         <div class="mb-3">

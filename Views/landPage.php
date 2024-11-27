@@ -10,6 +10,36 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+require '../conexion.php';
+
+// test de conexcion 
+try {
+    $conexion = new conexion();
+    $pdo = $conexion->conectar();
+    
+    if (!$pdo) {
+        throw new Exception('Could not connect to database');
+    }
+} catch (Exception $e) {
+    die("Connection error: " . $e->getMessage());
+}
+
+// agarrar los cursos recientes
+$stmt = $pdo->prepare("CALL sp_obtener_cursos(?, ?, ?)");
+$stmt->execute([0, 'recientes', $_SESSION['user_id']]);
+$cursos_recientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
+// los mas vendidos  
+
+
+// the bought courses are called here
+$stmt = $pdo->prepare("CALL sp_obtener_cursos_comprados(?)");
+$stmt->execute([$_SESSION['user_id']]);
+$cursos_comprados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+
+$pdo = null;
 ?>
 
 
@@ -36,283 +66,137 @@ if (!isset($_SESSION['user_id'])) {
 <body class="d-flex flex-column min-vh-100">
 
 
-        
+
     <div class="container conLogo">
         <h1 class="titulos">A&B Cursos</h1>
         </div>
     
                         <!--Navbar-->
-<div class="container card">
+<!--Navbar-->
+    <div class="container card">
 
-          <nav class="navbar navbar-expand-lg navbar-light ">
-            <div class="container-fluid">
-                <!-- Logo de la barra de navegación -->
-                <!-- <a class="navbar-brand" href="#">A&J</a> -->
-                
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <!-- Contenido oculto en dispositivos pequeños -->
-                <div class="collapse navbar-collapse" id="navbarOpciones">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item border-end">
-                            <a class="nav-link active textos-2" aria-current="page" href="landPage.php">Principal</a>
-                        </li>
+        <nav class="navbar navbar-expand-lg navbar-light ">
+        <div class="container-fluid">
+            
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOpciones" aria-controls="navbarOpciones" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            
+            <div class="collapse navbar-collapse" id="navbarOpciones">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item border-end">
+                        <a class="nav-link active textos-2" aria-current="page" href="landPage.php">Principal</a>
+                    </li>
 
-                        <li class="nav-item border-end">
-                            <a class="nav-link active textos-2" aria-current="page" href="perfil.php">Mi perfil</a>
-                        </li>
+                    <li class="nav-item border-end">
+                        <a class="nav-link active textos-2" aria-current="page" href="perfil.php">Mi perfil</a>
+                    </li>
 
-                        <li class="nav-item border-end">
-                            <a class="nav-link active textos-2" aria-current="page" href="chat.html">Mis chats</a>
-                        </li>
+                    <li class="nav-item border-end">
+                        <a class="nav-link active textos-2" aria-current="page" href="chat.php">Mis chats</a>
+                    </li>
 
-                        
-                        <!-- Desplegable de opciones -->
-                        <li class="nav-item dropdown border-end">
-                            <a class="nav-link dropdown-toggle textos-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Categorias
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item textos-2" href="Busqueda.html">Arte</a></li>
-                                <li><a class="dropdown-item textos-2" href="Busqueda.html">Matematicas</a></li>
-                                <li><a class="dropdown-item textos-2" href="Busqueda.html">Programacion</a></li>
-                                 <!--li><hr class="dropdown-divider"></li> 
-                                <li><a class="dropdown-item textos-2" href="#">Cerrar sesion</a></li--> <!--style letras rojas-->
- 
-                            </ul>
-                        </li>
+                    
+                    
 
-                        <li class="nav-item"></li>
-                            <a class="nav-link active textos-2" aria-current="page" href="../Controllers/logout.php">Cerrar sesion</a>
-                        </li>
-                    </ul>
-        
-                    <!-- Formulario de búsqueda ajustable -->
-                    <form class="d-flex w-auto w-md-50 w-lg-50">
-                        <input class="form-control me-2 textos-2" type="search" placeholder="Buscar" aria-label="Buscar">
-                        <button class="btn btn-outline-dark textos-2" type="submit">Buscar</button>
-                    </form>
-        
-                </div>
+                    <li class="nav-item">
+                        <a class="nav-link active textos-2" aria-current="page" href="../Controllers/logout.php">Cerrar sesion</a>
+                    </li>
+                </ul>
+
+                <!-- Form de búsqueda  -->
+                <form class="d-flex w-auto w-md-50 w-lg-50" method="POST" action="../Controllers/guardarBusqueda.php">
+                    <input class="form-control me-2 textos-2" type="search" name="textBuscar" placeholder="Buscar" aria-label="Buscar">
+                    <button class="btn btn-outline-dark textos-2" type="submit">Buscar</button>
+                </form>
+
             </div>
+        </div>
         </nav>
-        
-</div>
+
+    </div>
 
     <hr class="opZero">
     
         <div class="container">
-            <h2 class="titulos">Cursos recientes</h2>
-            <p class="textos"> Aquí encontrarás los cursos recien agregados a nuestra plataforma.</p>
+            <h2 class="titulos">Cursos disponibles</h2>
+            <p class="textos"> Aquí encontrarás los cursos disponibles en la plataforma.</p>
         </div>      
           
           
           <!--                                                                       Cajita con cursos-->
-        <div class="container cont-Cursos px-2 ">
-        <div class="row rowCursos gx-5" >
-    
-    
-            <!--Aqui agregar cada curso-->
-    
-            <div class="card col-lg col-md-5 col-sm-11 px-0" >
+        <div class="container cont-Cursos px-2">
+    <div class="row rowCursos gx-5">
+        <?php foreach ($cursos_recientes as $curso): ?>
+            <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
                 <div class="row no-gutters">
                     <div class="col-5">
                         <div class="card-body">
-                            <h4 class="card-title subtitulos">SQL Basico</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Introduccion a la materia SQL donde...</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="CursoComprar.html" class="btn btn-primary btn-sm">Leer más</a>
+                            <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['titulo']) ?></h4>
+                            <p class="subtitulos-categoria small"><?= htmlspecialchars($curso['autor']) ?> | <?= htmlspecialchars($curso['categoria']) ?></p>
+                            <p class="textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
+                            <p class="textos">Costo $<?= number_format($curso['precio'], 2) ?></p>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <a href="CursoComprar.php?id=<?= $curso['id'] ?>" class="btn btn-primary btn-sm">Leer más</a>
+                            <?php else: ?>
+                                <a href="inicioSesion.php" class="btn btn-primary btn-sm">Iniciar sesión para ver</a>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
+                        <img class="img-fluid h-100 imgCard" 
+                             src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
+                             alt="Imagen del curso">
                     </div>
                 </div>
-            </div>  
-    
-            <div class="card col-lg col-md-5 col-sm-11 px-0">
-                <div class="row no-gutters">
-                    <div class="col-5">
-                        <div class="card-body">
-                            <h4 class="card-title subtitulos">Bootstrap</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Info de lo que se trata el curso</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
-                        </div>
-                    </div>
-                    <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/boots.jpg" alt="Imagen del curso">
-                    </div>
-                </div>
-            </div>  
-    
-            <div class="card col-lg col-md-5 col-sm-11 px-0">
-                <div class="row no-gutters">
-                    <div class="col-5">
-                        <div class="card-body">
-                            <h4 class="card-title subtitulos">Nombre curso</h4>
-                            <p class="subtitulos-categoria small">Autor | Categoria</p>
-                            <p class="textos">Info de lo que se trata el curso</p>
-                            <p class="textos">Costo $20.50</p>
-                            <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                        </div>
-                    </div>
-                    <div class="col-7">
-                        <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                    </div>
-                </div>
-            </div>          
-    
-        </div>
-    
-            
-    
-        </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<!----->
+
 
         
         <div class="container"><hr>
-            <h2 class="titulos">Top ventas</h2>
-            <p class="textos">Aquí se mostrarán los cursos más vendidos</p>
+            <h2 class="titulos">Cursos comprados</h2>
+            <p class="textos">Aquí estan tus cursos comprados</p>
         </div>  
 
-
-                  <!--                                                                Cajita con cursos-->
-                  <div class="container cont-Cursos px-2 ">
-                    <div class="row rowCursos gx-5" >
-                
-                
-                        <!--Aqui agregar cada curso-->
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0" >
+        <div class="container cont-Cursos px-2">
+            <div class="row rowCursos gx-5">
+                <?php if (!empty($cursos_comprados)): ?>
+                    <?php foreach ($cursos_comprados as $curso): ?>
+                        <div class="card col-lg-5 col-md-5 col-sm-11 px-0">
                             <div class="row no-gutters">
                                 <div class="col-5">
                                     <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso...</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="CursoComprar.html" class="btn btn-primary btn-sm">Leer más</a>
+                                        <h4 class="card-title subtitulos"><?= htmlspecialchars($curso['titulo']) ?></h4>
+                                        <p class="subtitulos-categoria small">
+                                            <?= htmlspecialchars($curso['autor']) ?> | <?= htmlspecialchars($curso['categoria']) ?>
+                                        </p>
+                                        <p class="textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
+                                        <p class="textos">Costo $<?= number_format($curso['precio'], 2) ?></p>
+                                        <a href="CursoVer.php?id=<?= $curso['id'] ?>" class="btn btn-primary btn-sm">Ver curso</a>
                                     </div>
                                 </div>
                                 <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
+                                    <img class="img-fluid h-100 imgCard" 
+                                         src="data:image/jpeg;base64,<?= base64_encode($curso['foto']) ?>" 
+                                         alt="Imagen del curso">
                                 </div>
                             </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>          
-                
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12 text-center">
+                        <p class="textos">No has comprado ningún curso todavía.</p>
                     </div>
-                
-                        
-                
-                    </div>
-
-        <div class="container"><hr>
-            <h2 class="titulos">Mejor calificados</h2>
-            <p class="textos">Aquí se mostrarán todos los cursos con mejor califiación</p>
-        </div>  
-
-
-                  <!--                                                                 Cajita con cursos-->
-                  <div class="container cont-Cursos px-2 ">
-                    <div class="row rowCursos gx-5" >
-                
-                
-                        <!--Aqui agregar cada curso-->
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0" >
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso...</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="CursoComprar.html" class="btn btn-primary btn-sm">Leer más</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="cursosVer.html" class="btn btn-primary btn-sm">Ver completo</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>  
-                
-                        <div class="card col-lg col-md-5 col-sm-11 px-0">
-                            <div class="row no-gutters">
-                                <div class="col-5">
-                                    <div class="card-body">
-                                        <h4 class="card-title subtitulos">Nombre curso</h4>
-                                        <p class="subtitulos-categoria small">Autor | Categoria</p>
-                                        <p class="textos">Info de lo que se trata el curso</p>
-                                        <p class="textos">Costo $20.50</p>
-                                        <a href="#" class="btn btn-primary btn-sm">Leer más</a>
-                                    </div>
-                                </div>
-                                <div class="col-7">
-                                    <img class="img-fluid h-100 imgCard" src="IMG/sql.png" alt="Imagen del curso">
-                                </div>
-                            </div>
-                        </div>          
-                
-                    </div>
-                
-                        
-                
-                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
 
         <main class="flex-grow-1 container">

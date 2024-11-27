@@ -1,17 +1,15 @@
-
-
 <?php
-class Conexion {
+class conexion {
     private $host = 'localhost'; //le cambie el host y contraseña y user por mi pc recuerden cambiarla cuando prueben ustedes
-    private $dbname = 'BDM'; 
-    private $username = 'root'; // Cambia esto según tu configuración
-    private $password = ''; // Deja vacío si no tienes contraseña en MySQL (por defecto en XAMPP) 
+    private $dbname = 'bdm-capa';  
     private $charset = 'utf8';
+    private $user = 'root'; 
+    private $password = ''; 
     private $pdo;
 
     public function conectar() {
         try {
-            $this->pdo = new PDO("mysql:host={$this->host};dbname={$this->dbname};charset={$this->charset}", $this->username, $this->password);
+            $this->pdo = new PDO("mysql:host={$this->host};dbname={$this->dbname};charset={$this->charset}", $this->user, $this->password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $this->pdo;
         } catch (PDOException $e) {
@@ -20,3 +18,5 @@ class Conexion {
         }
     }
 }
+?>
+

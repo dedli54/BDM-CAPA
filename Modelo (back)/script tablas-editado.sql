@@ -1,15 +1,7 @@
-CREATE DATABASE BDM;
+CREATE DATABASE bdm-capa;
 
-use BDM;
-
-/*
-usando workbech, además no se pudo crear el trigger: tg_categoria_creada
-CREATE DATABASE `bdm-capa`;
-
-USE `bdm-capa`;
-*/
-
--- TABLAS--
+USING DATABASE bdm-capa;
+-- TABLAS    Test--
 
 -- LA PRIMER TABLA QUE SE DEBE CREAR ES LA DE TIPO DE USUARIOS
 
@@ -162,20 +154,18 @@ BEGIN
     WHERE id = NEW.id_admin AND tipo_usuario = 1; -- 1 es el tipo para Administrador
 
     -- Registrar la categoría creada en la tabla de auditoría
-    INSERT INTO reporte_categoria (id_admin, nombre_admin, nombre_categoria)
+    INSERT INTO auditoria_categoria (id_admin, nombre_admin, nombre_categoria)
     VALUES (NEW.id_admin, admin_nombre, NEW.nombre);
 END$$
 DELIMITER ;
--- Ocupa que agreguen el id_admin a categoria si quieren que este trigger funcione
 
 
 -- TRIGGERS -- 
 
--- STORE PROCEDURE -- 
+-- STORE PROCEDURE --
+
 
 -- SP para crear usuarios
-DROP PROCEDURE sp_crear_usuario
-
 DELIMITER $$
 
 CREATE PROCEDURE sp_crear_usuario(
@@ -192,25 +182,15 @@ CREATE PROCEDURE sp_crear_usuario(
     IN p_cuenta_bancaria VARCHAR(50)
 )
 BEGIN
-    -- Aqui validamos que sea algun formato correcto de gmail como .uanl .com .org
-    IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El formato del email no es válido';
-    END IF;
-
-    -- Aqui validamos los requisitos de la contraseña
-    IF p_contrasena NOT REGEXP '^(?=.[a-z])(?=.[A-Z])(?=.\\d)(?=.[@$!%?&])[A-Za-z\\d@$!%?&]{8,}$' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La contraseña no cumple con los requisitos: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial';
-    END IF;
-
-    -- Aqui validamos si el email ya existe
+    -- Verifica si el email ya existe
     IF EXISTS (SELECT 1 FROM usuario WHERE email = p_email) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El email ya está en uso';
     ELSE
-        -- Insertar el nuevo usuario si las validaciones son correctas
+        -- Si no existe, inserta el nuevo usuario
         INSERT INTO usuario (nombre_usuario, nombre, apellidos, email, contrasena, tipo_usuario, foto, fecha_nacimiento, telefono)
         VALUES (p_nombre_usuario, p_nombre, p_apellidos, p_email, p_contrasena, p_tipo_usuario, p_foto, p_fecha_nacimiento, p_telefono);
 
-        -- Si el usuario es un instructor, insertar biografía y cuenta bancaria
+        -- Si el usuario es un instructor, insertar biografía y cuenta bancaria en tabla instructor
         IF p_tipo_usuario = 2 THEN
             INSERT INTO instructor (id, biografia, cuenta_bancaria)
             VALUES (LAST_INSERT_ID(), p_biografia, p_cuenta_bancaria);
@@ -252,13 +232,12 @@ BEGIN
     WHERE id = p_id;
 
     -- Si el usuario es un instructor, actualizar biografía y cuenta bancaria
-    /*
     IF p_tipo_usuario = 2 THEN
         UPDATE instructor
         SET biografia = p_biografia,
             cuenta_bancaria = p_cuenta_bancaria
         WHERE id = p_id;
-    END IF;*/
+    END IF;
 END$$
 
 DELIMITER ;
@@ -431,81 +410,3 @@ END $$
 DELIMITER ;
 
 -- STORE PROCEDURE--
-
--- PROCEDURE PARA EL LOGIN 
-
-DELIMITER $$
-
-CREATE PROCEDURE sp_login(
-    IN p_email VARCHAR(100),
-    IN p_contrasena VARCHAR(255)
-)
-BEGIN
-    DECLARE v_id INT;
-    DECLARE v_tipo_usuario TINYINT;
-
-    -- Verifica si el email y la contraseña son correctos
-    SELECT id, tipo_usuario INTO v_id, v_tipo_usuario
-    FROM usuario
-    WHERE email = p_email AND contrasena = p_contrasena;
-
-    -- Si se encuentra un usuario, retorna el id y tipo de usuario
-    IF v_id IS NOT NULL THEN
-        SELECT v_id AS id, v_tipo_usuario AS tipo_usuario;
-    ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email o contraseña incorrectos';
-    END IF;
-END$$
-
-DELIMITER ;
-
--- Así se usa: CALL sp_login('admin@example.com', 'password123');
-select * from usuario;
-
--- Por que hay un segundo sp_crear_usuario lol
---SP 
-DELIMITER $$
-
-CREATE PROCEDURE sp_crear_usuario(
-    IN p_nombre_usuario VARCHAR(100),
-    IN p_nombre VARCHAR(100),
-    IN p_apellidos VARCHAR(100),
-    IN p_email VARCHAR(100),
-    IN p_contrasena VARCHAR(255),
-    IN p_tipo_usuario TINYINT,
-    IN p_foto BLOB,
-    IN p_fecha_nacimiento DATE,
-    IN p_telefono BIGINT,
-    IN p_biografia TEXT,
-    IN p_cuenta_bancaria VARCHAR(50)
-)
-BEGIN
-    -- Aqui validamos que sea algun formato correcto de gmail como .uanl .com .org
-    IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El formato del email no es válido';
-    END IF;
-
-    -- Aqui validamos los requisitos de la contraseña
-    IF p_contrasena NOT REGEXP '^(?=.[a-z])(?=.[A-Z])(?=.\\d)(?=.[@$!%?&])[A-Za-z\\d@$!%?&]{8,}$' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La contraseña no cumple con los requisitos: debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial';
-    END IF;
-
-    -- Aqui validamos si el email ya existe
-    IF EXISTS (SELECT 1 FROM usuario WHERE email = p_email) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El email ya está en uso';
-    ELSE
-        -- Insertar el nuevo usuario si las validaciones son correctas
-        INSERT INTO usuario (nombre_usuario, nombre, apellidos, email, contrasena, tipo_usuario, foto, fecha_nacimiento, telefono)
-        VALUES (p_nombre_usuario, p_nombre, p_apellidos, p_email, p_contrasena, p_tipo_usuario, p_foto, p_fecha_nacimiento, p_telefono);
-
-        -- Si el usuario es un instructor, insertar biografía y cuenta bancaria
-        IF p_tipo_usuario = 2 THEN
-            INSERT INTO instructor (id, biografia, cuenta_bancaria)
-            VALUES (LAST_INSERT_ID(), p_biografia, p_cuenta_bancaria);
-		END IF;
-    END IF;
-END$$
-
-DELIMITER ;
-
-

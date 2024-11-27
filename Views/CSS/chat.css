@@ -102,3 +102,37 @@ footer {
 .imgCard{
     object-fit: cover;
 }
+
+.users-list {
+    height: 500px;
+    overflow-y: auto;
+}
+
+.user-item {
+    transition: background-color 0.3s;
+}
+
+.user-item:hover {
+    background-color: #f8f9fa;
+}
+
+.message {
+    border-radius: 10px;
+    margin: 5px 0;
+    max-width: 70%;
+}
+
+.sent {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+}
+
+.received {
+    background-color: #f8f9fa;
+    margin-right: auto;
+}
+
+.chat-messages {
+    padding: 15px;
+}
