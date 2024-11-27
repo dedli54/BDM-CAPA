@@ -1,7 +1,7 @@
 <?php
 class conexion {
-    private $host = 'localhost';
-    private $dbname = 'bdm-capa'; 
+    private $host = 'localhost'; //le cambie el host y contraseña y user por mi pc recuerden cambiarla cuando prueben ustedes
+    private $dbname = 'bdm-capa';  
     private $charset = 'utf8';
     private $user = 'root'; 
     private $password = ''; 
