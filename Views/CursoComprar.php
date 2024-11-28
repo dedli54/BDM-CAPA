@@ -50,15 +50,12 @@ try {
 
 <title>Curso</title>
 <!--script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"-->
 <link rel="stylesheet" href="CSS/bootstrapCSS/bootstrap.min.css">
 <link rel="stylesheet" href="CSS/colores.css">
 <link rel="stylesheet" href="CSS/perfil.css">
 
-
-
-
-
+<script src="https://www.paypal.com/sdk/js?client-id=AQ1I1TYLRZMIgA_nJge5bRAWPSXHoK7d0g2mrrwQGJAb_XQkqOYc5dm3STiZbliO2arMTVxn8dS9YbYE&currency=MXN"></script>
 
 </head>
 
@@ -140,9 +137,9 @@ try {
                         <p class="fs-5 textos"><?= htmlspecialchars($curso['descripcion']) ?></p>
                         <p class="fs-5 textos">Instructor: <?= htmlspecialchars($curso['autor']) ?></p>
                         <div class="d-flex justify-content-end btnDiv">
-                            <button class="btn btn-lg btn-dark" id="buyCurso">
-                                Comprar curso ($<?= number_format($curso['precio'], 2) ?>)
-                            </button>
+                            <!-- Replace existing button with PayPal container -->
+                            <div id="paypal-button-container"></div>
+                            <p class="ms-3 fs-4">Precio: $<?= number_format($curso['precio'], 2) ?></p>
                         </div>
 
 
@@ -271,7 +268,9 @@ try {
         </div>
     </footer>
 
-    
-<script src="JS/comprarCurso.js"></script>
+    <script src="JS/paypal.js"></script>
+<!--<script src="JS/comprarCurso.js"></script>-->
 <script src="JS/bootstrapJS/bootstrap.bundle.min.js"></script>
+
 </body>
+</html>

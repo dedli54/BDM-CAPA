@@ -410,3 +410,93 @@ END $$
 DELIMITER ;
 
 -- STORE PROCEDURE--
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_comprar_curso_paypal(
+    IN p_id_alumno INT,
+    IN p_id_curso INT, 
+    IN p_paypal_order_id VARCHAR(50)
+)
+BEGIN
+    DECLARE v_monto DECIMAL(10,2);
+    DECLARE v_error INT DEFAULT 0;
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET v_error = 1;
+    
+    START TRANSACTION;
+    
+    -- Get course price
+    SELECT precio INTO v_monto 
+    FROM curso 
+    WHERE id = p_id_curso AND status = 1;
+    
+    -- Verify course exists and is active
+    IF v_monto IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El curso no existe o no está disponible';
+    END IF;
+    
+    -- Verify student isn't already enrolled
+    IF EXISTS (
+        SELECT 1 
+        FROM inscripcion 
+        WHERE id_alumno = p_id_alumno AND id_curso = p_id_curso
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El alumno ya está inscrito en este curso';
+    END IF;
+
+    -- Record transaction
+    INSERT INTO transaccion (
+        id_alumno,
+        id_curso,
+        monto,
+        fecha,
+        metodo_pago,
+        referencia_pago
+    ) VALUES (
+        p_id_alumno,
+        p_id_curso,
+        v_monto,
+        NOW(),
+        'paypal',
+        p_paypal_order_id
+    );
+
+    -- Register enrollment
+    INSERT INTO inscripcion (
+        id_alumno,
+        id_curso,
+        fecha_inscripcion,
+        estado
+    ) VALUES (
+        p_id_alumno,
+        p_id_curso,
+        NOW(),
+        1
+    );
+
+    -- Initialize progress tracking
+    INSERT INTO progreso_curso (
+        id_alumno,
+        id_curso,
+        nivel_actual,
+        fecha_inicio
+    ) VALUES (
+        p_id_alumno,
+        p_id_curso,
+        1,
+        NOW()
+    );
+
+    IF v_error = 1 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error al procesar la compra';
+    ELSE
+        COMMIT;
+    END IF;
+END $$
+
+DELIMITER ;
