@@ -68,6 +68,8 @@ try {
     die("Error al cargar categorías: " . $e->getMessage());
 }
 
+$userType = $_SESSION['user_type']; 
+
 ?>
 
 

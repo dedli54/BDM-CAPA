@@ -57,5 +57,6 @@ try {
 } catch (Exception $e) {
     
     echo json_encode(['success' => false, 'message' => 'Ocurrió un error inesperado: ' . $e->getMessage()]);
+    
 }
 ?>

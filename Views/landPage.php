@@ -31,6 +31,7 @@ $cursos_recientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
 
 // los mas vendidos  
+$userType = $_SESSION['user_type']; // Obtener el tipo de usuario de la sesión
 
 
 // the bought courses are called here

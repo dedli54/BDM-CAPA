@@ -15,6 +15,13 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+require_once __DIR__ . '/../Core/bootstrap.php';
+
+use Core\Middleware\RoleMiddleware;
+
+
+$middleware = new RoleMiddleware();
+$middleware->handle('admin');
 
 ?>
 
