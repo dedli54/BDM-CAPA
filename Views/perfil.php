@@ -60,6 +60,14 @@ try {
     die("Error: " . $e->getMessage());
 }
 
+try {
+    // Cargar las categorías para el formulario de edición
+    $stmt = $pdo->query("SELECT id, nombre FROM categoria");
+    $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    die("Error al cargar categorías: " . $e->getMessage());
+}
+
 ?>
 
 
@@ -236,6 +244,9 @@ try {
             <button class="btn btn-lg btn-dark admin" id="buyCurso">Agregar Categoria</button>
         </div>
         <div class="d-flex justify-content-end btnDiv"> 
+            <button class="btn btn-lg btn-dark admin" id="editCategoria">Editar Categoria</button>
+        </div>
+        <div class="d-flex justify-content-end btnDiv"> 
             <!--<button class="btn btn-lg btn-dark admin" id=""  >Agregar Admin</button>  NewAdministrador -->
             <a href="NewAdministrador.php" class="btn btn-lg btn-dark admin">Crear cuenta para Admin</a>
         </div>
@@ -283,7 +294,56 @@ try {
 
                         </form>
                     
+                
+
         </div>
+        
+        <!--                FORMS OCULTO PARA EDITAR CATEGORIA         -->
+        <div id="overlayEditar" class="overlay" style="display: none;"></div>
+        <div class="container card buyForms" id="formEditarCategoria" style="display: none;">
+                <form id="formEditar" method="POST">
+                    
+                <div class="row d-flex justify-content-center">
+                    <div class="col-5">
+                <!-- Selector de categorías -->
+                <div class="mb-3">
+                    <label for="categoriaId" class="form-label">Seleccionar categoría a editar:</label>
+                    <select class="form-control" id="categoriaId" name="categoriaId" required>
+                        <option value="">Seleccione una categoría</option>
+                        <?php
+                        
+                        if ($categorias) {
+                            foreach ($categorias as $categoria) {
+                                echo '<option value="' . htmlspecialchars($categoria['id']) . '">' . htmlspecialchars($categoria['nombre']) . '</option>';
+                            }
+                        } else {
+                            echo '<option value="">No hay categorías disponibles</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nameCatEditar" class="form-label">Nombre de categoria (no repetir):</label>
+                    <input type="text" class="form-control" id="nameCatEditar" name="nameCat" placeholder="Nuevo nombre" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="definicionEditar" class="form-label">Nueva Definición:</label>
+                    <input type="text" class="form-control" id="definicionEditar" name="definicion" placeholder="Nueva definición" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end"> 
+            <button type="submit" class="btn btn-lg btn-dark" id="btnEditarCategoria">Actualizar</button>
+        </div>
+
+                </form>
+
+        </div>
+
+        
 
     <main class="flex-grow-1 container">
     <hr class="opZero"><hr class="opZero"><hr class="opZero">
@@ -302,5 +362,6 @@ try {
 
     
 <script src="JS/addCategoria.js"></script>  <!-- Mostrar Ventana flotante  formCategoria  -->
+<script src="JS/editCategoria.js"></script>
 <script src="JS/perfil.js"></script> <!-- Esconde las acciones de perfil dependiendo del tipo de usuario --> 
 </body>
